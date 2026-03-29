@@ -3,20 +3,20 @@ from players.models import Player
 
 
 class Championship(models.Model):
-    STATUS_CHOICES = [
-        ('rascunho', 'Rascunho'),
-        ('inscricoes', 'Inscrições Abertas'),
-        ('fase_grupos', 'Fase de Grupos'),
-        ('eliminatorias', 'Fase Eliminatória'),
-        ('finalizado', 'Finalizado'),
-    ]
-
     name = models.CharField('Nome', max_length=200)
-    data_inicio = models.DateField('Data de Início')
-    data_fim = models.DateField('Data de Fim')
+    data_inicio = models.DateField('Data')
     local = models.CharField('Local', max_length=200)
-    status = models.CharField('Status', max_length=20, choices=STATUS_CHOICES, default='rascunho')
+    finalizado = models.BooleanField('Finalizado', default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def is_finished(self):
+        from datetime import date
+        return self.finalizado or self.data_inicio < date.today()
+
+    @property
+    def has_bracket(self):
+        return self.matches.exclude(phase='grupo').exists()
 
     class Meta:
         verbose_name = 'Campeonato'

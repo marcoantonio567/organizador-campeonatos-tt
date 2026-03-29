@@ -8,7 +8,7 @@
     <a href="{% url 'championships:detail' championship.pk %}" class="btn btn-outline-secondary btn-sm">
       <i class="bi bi-arrow-left"></i> Voltar
     </a>
-    {% if championship.status == 'fase_grupos' %}
+    {% if not championship.is_finished %}
     <form method="post" action="{% url 'championships:generate_elimination' championship.pk %}">
       {% csrf_token %}
       <button class="btn btn-danger btn-sm">

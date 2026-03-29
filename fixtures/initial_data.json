@@ -14,10 +14,9 @@
 
   {"model": "championships.championship", "pk": 1, "fields": {
     "name": "Campeonato Municipal 2025",
-    "data_inicio": "2025-06-01",
-    "data_fim": "2025-06-15",
+    "data_inicio": "2026-06-01",
     "local": "Ginásio Municipal Centro",
-    "status": "inscricoes",
+    "finalizado": false,
     "created_at": "2025-01-01T00:00:00Z"
   }},
 

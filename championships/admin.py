@@ -21,8 +21,8 @@ class GroupStandingInline(admin.TabularInline):
 
 @admin.register(Championship)
 class ChampionshipAdmin(admin.ModelAdmin):
-    list_display = ['name', 'status', 'data_inicio', 'data_fim', 'local']
-    list_filter = ['status']
+    list_display = ['name', 'data_inicio', 'local', 'finalizado']
+    list_filter = ['finalizado']
     search_fields = ['name']
     inlines = [EnrollmentInline]
 

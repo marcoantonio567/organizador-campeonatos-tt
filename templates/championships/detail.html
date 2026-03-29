@@ -5,18 +5,25 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
   <div>
     <h2 class="mb-0">{{ championship.name }}</h2>
-    <span class="badge badge-status-{{ championship.status }} mt-1">{{ championship.get_status_display }}</span>
+    {% if championship.is_finished %}
+      <span class="badge bg-success mt-1">Finalizado</span>
+    {% else %}
+      <span class="badge bg-primary mt-1">Ativo</span>
+    {% endif %}
   </div>
   <div class="d-flex gap-2">
     <a href="{% url 'championships:update' championship.pk %}" class="btn btn-outline-secondary btn-sm">
       <i class="bi bi-pencil"></i> Editar
+    </a>
+    <a href="{% url 'championships:delete' championship.pk %}" class="btn btn-outline-danger btn-sm">
+      <i class="bi bi-trash"></i> Excluir
     </a>
     {% if championship.groups.exists %}
     <a href="{% url 'championships:groups' championship.pk %}" class="btn btn-outline-primary btn-sm">
       <i class="bi bi-grid"></i> Grupos
     </a>
     {% endif %}
-    {% if championship.status == 'eliminatorias' or championship.status == 'finalizado' %}
+    {% if has_bracket %}
     <a href="{% url 'championships:bracket' championship.pk %}" class="btn btn-outline-danger btn-sm">
       <i class="bi bi-diagram-3"></i> Chave
     </a>
@@ -45,7 +52,7 @@
     <div class="card">
       <div class="card-body text-center">
         <div class="h4 fw-bold">{{ championship.data_inicio }}</div>
-        <div class="text-muted">Início</div>
+        <div class="text-muted">Data</div>
       </div>
     </div>
   </div>
@@ -55,9 +62,7 @@
   <!-- Inscritos -->
   <div class="col-md-6">
     <div class="card">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <strong>Inscritos</strong>
-      </div>
+      <div class="card-header"><strong>Inscritos</strong></div>
       <div class="card-body p-0">
         <table class="table table-sm mb-0">
           <thead>
@@ -90,6 +95,7 @@
   <!-- Ações -->
   <div class="col-md-6">
     <!-- Inscrever jogador -->
+    {% if not championship.is_finished %}
     <div class="card mb-3">
       <div class="card-header"><strong>Inscrever Jogador</strong></div>
       <div class="card-body">
@@ -102,7 +108,6 @@
     </div>
 
     <!-- Gerar Grupos -->
-    {% if championship.status != 'eliminatorias' and championship.status != 'finalizado' %}
     <div class="card mb-3">
       <div class="card-header"><strong>Gerar Fase de Grupos</strong></div>
       <div class="card-body">
@@ -117,10 +122,9 @@
         <small class="text-muted">⚠️ Isso apagará grupos existentes e recriará tudo.</small>
       </div>
     </div>
-    {% endif %}
 
     <!-- Gerar Chave Eliminatória -->
-    {% if championship.status == 'fase_grupos' %}
+    {% if championship.groups.exists %}
     <div class="card">
       <div class="card-header"><strong>Fase Eliminatória</strong></div>
       <div class="card-body">
@@ -131,6 +135,7 @@
         </form>
       </div>
     </div>
+    {% endif %}
     {% endif %}
   </div>
 </div>

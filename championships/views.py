@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
-from django.views.generic import ListView, CreateView, UpdateView, DetailView, FormView, View
+from django.views.generic import ListView, CreateView, UpdateView, DetailView, DeleteView, FormView, View
 
 from .forms import ChampionshipForm, EnrollPlayerForm, GenerateGroupsForm
 from .models import Championship, Enrollment, Group
@@ -17,6 +17,15 @@ class ChampionshipListView(ListView):
     model = Championship
     template_name = 'championships/list.html'
     context_object_name = 'championships'
+
+    def get_context_data(self, **kwargs):
+        from datetime import date
+        ctx = super().get_context_data(**kwargs)
+        today = date.today()
+        ctx['ativos']    = Championship.objects.filter(data_inicio__gte=today).order_by('-data_inicio')
+        ctx['historico'] = Championship.objects.filter(data_inicio__lt=today).order_by('-data_inicio')
+        ctx['today'] = today
+        return ctx
 
 
 class ChampionshipCreateView(CreateView):
@@ -56,7 +65,15 @@ class ChampionshipDetailView(DetailView):
         ctx['enrollments'] = championship.enrollments.select_related('player').order_by('seed')
         ctx['enroll_form'] = EnrollPlayerForm(championship)
         ctx['generate_groups_form'] = GenerateGroupsForm()
+        ctx['has_bracket'] = championship.matches.exclude(phase='grupo').exists()
         return ctx
+
+
+class ChampionshipDeleteView(DeleteView):
+    model = Championship
+    template_name = 'championships/confirm_delete.html'
+    success_url = reverse_lazy('championships:list')
+    context_object_name = 'championship'
 
 
 class EnrollPlayerView(View):
@@ -91,8 +108,6 @@ class GenerateGroupsView(View):
                 groups = generate_groups(championship, num_groups)
                 for group in groups:
                     generate_round_robin(group)
-                championship.status = 'fase_grupos'
-                championship.save(update_fields=['status'])
                 messages.success(request, f'{len(groups)} grupos gerados com sucesso.')
             except ValueError as e:
                 messages.error(request, str(e))
@@ -118,8 +133,6 @@ class GenerateEliminationView(View):
         championship = get_object_or_404(Championship, pk=pk)
         try:
             generate_elimination_bracket(championship)
-            championship.status = 'eliminatorias'
-            championship.save(update_fields=['status'])
             messages.success(request, 'Chave eliminatória gerada com sucesso.')
         except ValueError as e:
             messages.error(request, str(e))

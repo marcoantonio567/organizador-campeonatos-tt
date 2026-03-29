@@ -9,44 +9,46 @@
   </a>
 </div>
 
-<div class="row g-3">
-  {% for ch in championships %}
-  <div class="col-md-4">
-    <div class="card h-100">
-      <div class="card-body">
-        <div class="d-flex justify-content-between align-items-start">
-          <h5 class="card-title mb-1">{{ ch.name }}</h5>
-          <span class="badge badge-status-{{ ch.status }}">{{ ch.get_status_display }}</span>
-        </div>
-        <p class="text-muted small mb-2">
-          <i class="bi bi-geo-alt"></i> {{ ch.local }}<br>
-          <i class="bi bi-calendar"></i> {{ ch.data_inicio }} → {{ ch.data_fim }}
-        </p>
-        <p class="text-muted small">
-          <i class="bi bi-people"></i> {{ ch.enrollments.count }} inscritos
-        </p>
+<ul class="nav nav-tabs mb-0" role="tablist">
+  <li class="nav-item">
+    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-ativos" type="button">
+      Ativos
+      <span class="badge bg-secondary ms-1">{{ ativos.count }}</span>
+    </button>
+  </li>
+  <li class="nav-item">
+    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-historico" type="button">
+      <i class="bi bi-clock-history"></i> Histórico
+      <span class="badge bg-secondary ms-1">{{ historico.count }}</span>
+    </button>
+  </li>
+</ul>
+
+<div class="tab-content">
+  <!-- Ativos -->
+  <div class="tab-pane fade show active" id="tab-ativos">
+    <div class="row g-3 pt-3">
+      {% for ch in ativos %}
+        {% include 'championships/_card.html' %}
+      {% empty %}
+      <div class="col">
+        <div class="alert alert-info mb-0">Nenhum campeonato ativo no momento.</div>
       </div>
-      <div class="card-footer bg-transparent d-flex gap-2">
-        <a href="{% url 'championships:detail' ch.pk %}" class="btn btn-sm btn-primary">
-          <i class="bi bi-eye"></i> Detalhes
-        </a>
-        {% if ch.groups.exists %}
-        <a href="{% url 'championships:groups' ch.pk %}" class="btn btn-sm btn-outline-secondary">
-          Grupos
-        </a>
-        {% endif %}
-        {% if ch.status == 'eliminatorias' or ch.status == 'finalizado' %}
-        <a href="{% url 'championships:bracket' ch.pk %}" class="btn btn-sm btn-outline-danger">
-          Chave
-        </a>
-        {% endif %}
-      </div>
+      {% endfor %}
     </div>
   </div>
-  {% empty %}
-  <div class="col">
-    <div class="alert alert-info">Nenhum campeonato cadastrado ainda.</div>
+
+  <!-- Histórico -->
+  <div class="tab-pane fade" id="tab-historico">
+    <div class="row g-3 pt-3">
+      {% for ch in historico %}
+        {% include 'championships/_card.html' with historico=True %}
+      {% empty %}
+      <div class="col">
+        <div class="alert alert-secondary mb-0">Nenhum campeonato no histórico ainda.</div>
+      </div>
+      {% endfor %}
+    </div>
   </div>
-  {% endfor %}
 </div>
 {% endblock %}

@@ -6,13 +6,11 @@ from players.models import Player
 class ChampionshipForm(forms.ModelForm):
     class Meta:
         model = Championship
-        fields = ['name', 'data_inicio', 'data_fim', 'local', 'status']
+        fields = ['name', 'data_inicio', 'local']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'data_inicio': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-            'data_fim': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'local': forms.TextInput(attrs={'class': 'form-control'}),
-            'status': forms.Select(attrs={'class': 'form-select'}),
         }
 
 

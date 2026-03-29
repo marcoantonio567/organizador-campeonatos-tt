@@ -269,3 +269,7 @@ def advance_winner(match: Match) -> None:
     _advance_winner(match)
     if match.group_id:
         calculate_standings(match.group)
+    # Auto-finalize championship when the final match has a winner
+    if match.phase == 'final' and match.winner_id:
+        match.championship.finalizado = True
+        match.championship.save(update_fields=['finalizado'])

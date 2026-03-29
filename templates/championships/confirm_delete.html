@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Excluir Campeonato{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-5">
+    <div class="card border-danger">
+      <div class="card-header bg-danger text-white"><h5 class="mb-0">Confirmar Exclusão</h5></div>
+      <div class="card-body">
+        <p>Deseja excluir o campeonato <strong>{{ championship.name }}</strong>?</p>
+        <p class="text-muted small">Todos os grupos, inscrições e partidas vinculados serão excluídos. Esta ação não pode ser desfeita.</p>
+        <form method="post" class="d-flex gap-2">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">Excluir</button>
+          <a href="{% url 'championships:detail' championship.pk %}" class="btn btn-outline-secondary">Cancelar</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
