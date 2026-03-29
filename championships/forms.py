@@ -16,10 +16,11 @@ class ChampionshipForm(forms.ModelForm):
 
 
 class EnrollPlayerForm(forms.Form):
-    player = forms.ModelChoiceField(
+    players = forms.ModelMultipleChoiceField(
         queryset=Player.objects.none(),
-        label='Jogador',
-        widget=forms.Select(attrs={'class': 'form-select'}),
+        label='Jogadores',
+        widget=forms.CheckboxSelectMultiple(),
+        required=False,
     )
 
     def __init__(self, championship, *args, **kwargs):
@@ -28,12 +29,11 @@ class EnrollPlayerForm(forms.Form):
             championship=championship
         ).values_list('player_id', flat=True)
 
-        # Apenas jogadores com ranking na categoria do campeonato
         eligible_ids = PlayerCategoryRanking.objects.filter(
             categoria=championship.categoria
         ).values_list('player_id', flat=True)
 
-        self.fields['player'].queryset = (
+        self.fields['players'].queryset = (
             Player.objects
             .filter(id__in=eligible_ids)
             .exclude(id__in=enrolled_ids)

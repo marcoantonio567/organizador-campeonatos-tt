@@ -109,16 +109,50 @@
 
   <!-- Ações -->
   <div class="col-md-6">
-    <!-- Inscrever jogador -->
+    <!-- Inscrever jogadores -->
     {% if not championship.is_finished %}
     <div class="card mb-3">
-      <div class="card-header"><strong>Inscrever Jogador</strong></div>
-      <div class="card-body">
-        <form method="post" action="{% url 'championships:enroll' championship.pk %}" class="d-flex gap-2">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <strong>Inscrever Jogadores</strong>
+        <span class="badge text-bg-secondary">{{ championship.get_categoria_display }}</span>
+      </div>
+      <div class="card-body p-0">
+        {% if enroll_form.players.field.queryset.exists %}
+        <form method="post" action="{% url 'championships:enroll' championship.pk %}">
           {% csrf_token %}
-          {{ enroll_form.player }}
-          <button type="submit" class="btn btn-primary btn-sm">Inscrever</button>
+          <div class="px-3 pt-3 pb-1 border-bottom d-flex gap-2">
+            <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-select-all">Selecionar todos</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-deselect-all">Limpar</button>
+          </div>
+          <ul class="list-group list-group-flush" id="enroll-list" style="max-height:260px;overflow-y:auto;">
+            {% for player in enroll_form.players.field.queryset %}
+            <li class="list-group-item px-3 py-2">
+              <div class="form-check d-flex justify-content-between align-items-center">
+                <div>
+                  <input class="form-check-input enroll-check me-2" type="checkbox"
+                         name="players" value="{{ player.pk }}" id="ep_{{ player.pk }}">
+                  <label class="form-check-label" for="ep_{{ player.pk }}">{{ player.name }}</label>
+                </div>
+                {% with ranking=player.category_rankings.all %}
+                {% for r in ranking %}{% if r.categoria == championship.categoria %}
+                  <span class="badge bg-secondary">{{ r.pontos }} pts</span>
+                {% endif %}{% endfor %}
+                {% endwith %}
+              </div>
+            </li>
+            {% endfor %}
+          </ul>
+          <div class="px-3 py-2 border-top">
+            <button type="submit" class="btn btn-primary btn-sm w-100">
+              <i class="bi bi-person-plus"></i> Inscrever Selecionados
+            </button>
+          </div>
         </form>
+        {% else %}
+        <div class="text-muted text-center py-4 small">
+          Todos os jogadores da categoria <strong>{{ championship.get_categoria_display }}</strong> já estão inscritos.
+        </div>
+        {% endif %}
       </div>
     </div>
 
@@ -154,4 +188,13 @@
     {% endif %}
   </div>
 </div>
+
+<script>
+document.getElementById('btn-select-all')?.addEventListener('click', function () {
+  document.querySelectorAll('.enroll-check').forEach(c => c.checked = true);
+});
+document.getElementById('btn-deselect-all')?.addEventListener('click', function () {
+  document.querySelectorAll('.enroll-check').forEach(c => c.checked = false);
+});
+</script>
 {% endblock %}

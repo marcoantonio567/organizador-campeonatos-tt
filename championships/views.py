@@ -82,12 +82,21 @@ class EnrollPlayerView(View):
         championship = get_object_or_404(Championship, pk=pk)
         form = EnrollPlayerForm(championship, request.POST)
         if form.is_valid():
-            player = form.cleaned_data['player']
-            seed = championship.enrollments.count() + 1
-            Enrollment.objects.create(championship=championship, player=player, seed=seed)
-            messages.success(request, f'{player.name} inscrito com sucesso.')
+            players = form.cleaned_data['players']
+            if not players:
+                messages.warning(request, 'Nenhum jogador selecionado.')
+                return redirect('championships:detail', pk=pk)
+            seed_start = championship.enrollments.count() + 1
+            for i, player in enumerate(players):
+                Enrollment.objects.get_or_create(
+                    championship=championship,
+                    player=player,
+                    defaults={'seed': seed_start + i},
+                )
+            count = len(players)
+            messages.success(request, f'{count} jogador{"es" if count > 1 else ""} inscrito{"s" if count > 1 else ""} com sucesso.')
         else:
-            messages.error(request, 'Erro ao inscrever jogador.')
+            messages.error(request, 'Erro ao inscrever jogadores.')
         return redirect('championships:detail', pk=pk)
 
 
