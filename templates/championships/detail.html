@@ -36,12 +36,14 @@
       <i class="bi bi-diagram-3-fill"></i> Chave
     </a>
     {% endif %}
+    {% if user.is_authenticated %}
     <a href="{% url 'championships:update' championship.pk %}" class="tt-btn ghost sm">
       <i class="bi bi-pencil-fill"></i> Editar
     </a>
     <a href="{% url 'championships:delete' championship.pk %}" class="tt-btn sm" style="background:#fee2e2;color:var(--tt-danger);border:1.5px solid #fecaca">
       <i class="bi bi-trash-fill"></i> Excluir
     </a>
+    {% endif %}
   </div>
 </div>
 
@@ -125,6 +127,7 @@
               {% if championship.categoria == 'avancado' %}
               <td class="text-end fw-bold" style="color:var(--tt-primary)">{{ enrollment.avancado_pontos }}</td>
               {% endif %}
+              {% if user.is_authenticated %}
               <td>
                 <form method="post" action="{% url 'championships:remove_enrollment' championship.pk enrollment.pk %}" class="d-inline">
                   {% csrf_token %}
@@ -133,6 +136,7 @@
                   </button>
                 </form>
               </td>
+              {% endif %}
             </tr>
             {% empty %}
             <tr>
@@ -152,6 +156,7 @@
 
   <!-- Ações -->
   <div class="col-md-6">
+    {% if user.is_authenticated %}
     {% if not championship.is_finished %}
 
     <!-- Inscrever jogadores -->
@@ -217,15 +222,15 @@
       <div class="tt-card-body">
         <form method="post" action="{% url 'championships:generate_groups' championship.pk %}">
           {% csrf_token %}
-          <div class="d-flex gap-2 align-items-end mb-2">
-            <div class="flex-grow-1">
-              <label class="tt-form-label">Nº de grupos</label>
-              {{ generate_groups_form.num_groups }}
-            </div>
-            <div>
-              <label class="tt-form-label">Senha de confirmação</label>
-              <input type="password" name="confirm_password" class="tt-form-control" placeholder="••••" style="width:130px" required>
-            </div>
+          <div class="mb-2">
+            <label class="tt-form-label">Nº de grupos</label>
+            {{ generate_groups_form.num_groups }}
+          </div>
+          <div class="mb-3">
+            <label class="tt-form-label">
+              <i class="bi bi-lock-fill me-1" style="color:var(--tt-danger)"></i> Senha de confirmação
+            </label>
+            <input type="password" name="confirm_password" class="tt-form-control" placeholder="••••" required>
           </div>
           <button type="submit" class="tt-btn accent w-100" style="justify-content:center">
             <i class="bi bi-grid-3x3-gap"></i> Gerar Grupos
@@ -261,6 +266,7 @@
       <i class="bi bi-info-circle-fill"></i>
       <span>Este campeonato está <strong>finalizado</strong>. Nenhuma alteração pode ser feita.</span>
     </div>
+    {% endif %}
     {% endif %}
   </div>
 </div>

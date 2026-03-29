@@ -12,7 +12,7 @@
     <span class="page-icon"><i class="bi bi-grid-3x3-gap-fill"></i></span>
     Grupos — <span style="color:var(--tt-text-muted);font-weight:500">{{ championship.name }}</span>
   </h2>
-  {% if not championship.is_finished %}
+  {% if user.is_authenticated and not championship.is_finished %}
   <form method="post" action="{% url 'championships:generate_elimination' championship.pk %}">
     {% csrf_token %}
     <button class="tt-btn danger">
@@ -67,7 +67,7 @@
                 <th title="Sets Ganhos" style="width:36px">S+</th>
                 <th title="Sets Perdidos" style="width:36px">S-</th>
                 <th title="Saldo de Sets" style="width:40px">SD</th>
-                {% if not championship.is_finished %}<th style="width:100px"></th>{% endif %}
+                {% if user.is_authenticated and not championship.is_finished %}<th style="width:100px"></th>{% endif %}
               </tr>
             </thead>
             <tbody>
@@ -100,7 +100,7 @@
                 <td>{{ standing.sets_won }}</td>
                 <td>{{ standing.sets_lost }}</td>
                 <td><strong>{{ standing.sets_balance }}</strong></td>
-                {% if not championship.is_finished %}
+                {% if user.is_authenticated and not championship.is_finished %}
                 <td>
                   {% if groups|length > 1 %}
                     {% if standing.player.pk in group.played_ids %}
@@ -180,9 +180,11 @@
                   {% endif %}
                 </td>
                 <td>
+                  {% if user.is_authenticated %}
                   <a href="{% url 'matches:update' match.pk %}" class="tt-btn ghost sm icon-only" title="Registrar resultado">
                     <i class="bi bi-pencil-fill"></i>
                   </a>
+                  {% endif %}
                 </td>
               </tr>
               {% endfor %}

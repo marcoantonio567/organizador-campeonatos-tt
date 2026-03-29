@@ -30,9 +30,11 @@
       </div>
     </div>
   </div>
+  {% if user.is_authenticated %}
   <a href="{% url 'players:update' player.pk %}" class="tt-btn ghost sm">
     <i class="bi bi-pencil-fill"></i> Editar
   </a>
+  {% endif %}
 </div>
 
 <!-- Ranking points per category -->

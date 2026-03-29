@@ -51,7 +51,7 @@
           <div class="bracket-match-footer">
             {% if match.status == 'finalizada' %}
               <span class="tt-badge concluida" style="font-size:.7rem"><i class="bi bi-check-circle-fill"></i> Finalizada</span>
-            {% else %}
+            {% elif user.is_authenticated %}
               <a href="{% url 'matches:update' match.pk %}" class="tt-btn accent sm" style="font-size:.75rem;padding:.25rem .6rem">
                 <i class="bi bi-pencil-fill"></i> Resultado
               </a>
@@ -69,15 +69,17 @@
 <div class="tt-alert warning">
   <i class="bi bi-exclamation-triangle-fill"></i>
   <span>Nenhuma partida eliminatória gerada ainda.</span>
+  {% if user.is_authenticated %}
   <form method="post" action="{% url 'championships:generate_elimination' championship.pk %}" class="ms-auto">
     {% csrf_token %}
     <button class="tt-btn accent sm"><i class="bi bi-lightning-charge-fill"></i> Gerar Agora</button>
   </form>
+  {% endif %}
 </div>
 {% endif %}
 
 <!-- Reorganizar posições -->
-{% if not championship.is_finished %}
+{% if user.is_authenticated and not championship.is_finished %}
 {% if first_round_slots or first_round_slots_locked %}
 <div class="tt-card mb-4">
   <div class="tt-card-header">
@@ -176,7 +178,7 @@
               {% endif %}
             </td>
             <td>
-              {% if match.status != 'finalizada' and match.player_a and match.player_b %}
+              {% if user.is_authenticated and match.status != 'finalizada' and match.player_a and match.player_b %}
               <a href="{% url 'matches:update' match.pk %}" class="tt-btn ghost sm icon-only" title="Registrar resultado">
                 <i class="bi bi-pencil-fill"></i>
               </a>

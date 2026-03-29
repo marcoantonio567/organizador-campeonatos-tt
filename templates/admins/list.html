@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% block title %}Gerenciar Admins{% endblock %}
+
+{% block content %}
+<div class="tt-page-header">
+  <h2>
+    <span class="page-icon"><i class="bi bi-shield-lock-fill"></i></span>
+    Gerenciar Admins
+  </h2>
+</div>
+
+<div class="row g-4">
+
+  <!-- Lista de admins -->
+  <div class="col-md-7">
+    <div class="tt-card">
+      <div class="tt-card-header">
+        <span><i class="bi bi-people-fill me-2" style="color:var(--tt-primary)"></i>Admins cadastrados</span>
+        <span class="tt-badge ativo">{{ admins.count }}</span>
+      </div>
+      <div class="tt-card-body p-0">
+        <table class="tt-table">
+          <thead>
+            <tr>
+              <th>Usuário</th>
+              <th style="width:120px">Criado em</th>
+              <th style="width:60px"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for admin_user in admins %}
+            <tr>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <span class="player-avatar" style="width:32px;height:32px;font-size:.72rem">
+                    {{ admin_user.username|slice:":2"|upper }}
+                  </span>
+                  <span class="fw-semibold">{{ admin_user.username }}</span>
+                  {% if admin_user == user %}
+                    <span class="tt-badge ativo" style="font-size:.7rem">você</span>
+                  {% endif %}
+                </div>
+              </td>
+              <td class="text-muted small">{{ admin_user.date_joined|date:"d/m/Y" }}</td>
+              <td>
+                {% if admin_user != user %}
+                <form method="post" action="{% url 'admins:delete' admin_user.pk %}" onsubmit="return confirm('Remover admin {{ admin_user.username }}?')">
+                  {% csrf_token %}
+                  <button type="submit" class="tt-btn sm icon-only" style="background:transparent;color:#fca5a5;border:1.5px solid #fecaca" title="Remover">
+                    <i class="bi bi-trash-fill"></i>
+                  </button>
+                </form>
+                {% else %}
+                <span title="Não é possível excluir sua própria conta" style="color:#94a3b8;font-size:.9rem">
+                  <i class="bi bi-lock-fill"></i>
+                </span>
+                {% endif %}
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="3">
+                <div class="empty-state" style="padding:1.5rem">
+                  <div class="empty-icon"><i class="bi bi-person-x"></i></div>
+                  <p>Nenhum admin cadastrado.</p>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Criar novo admin -->
+  <div class="col-md-5">
+    <div class="tt-card">
+      <div class="tt-card-header">
+        <span><i class="bi bi-person-plus-fill me-2" style="color:var(--tt-success)"></i>Novo Admin</span>
+      </div>
+      <div class="tt-card-body">
+        <form method="post" action="{% url 'admins:create' %}">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="tt-form-label"><i class="bi bi-person-fill me-1"></i> Usuário</label>
+            {{ form.username }}
+          </div>
+          <div class="mb-3">
+            <label class="tt-form-label"><i class="bi bi-lock-fill me-1"></i> Senha</label>
+            {{ form.password }}
+          </div>
+          <div class="mb-4">
+            <label class="tt-form-label"><i class="bi bi-lock-fill me-1"></i> Confirmar senha</label>
+            {{ form.password_confirm }}
+          </div>
+          <button type="submit" class="tt-btn primary w-100" style="justify-content:center">
+            <i class="bi bi-person-check-fill"></i> Criar Admin
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

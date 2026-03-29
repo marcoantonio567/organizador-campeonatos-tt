@@ -36,12 +36,14 @@
             <span class="text-muted small"> pts</span>
           </td>
           <td class="text-end">
+            {% if user.is_authenticated %}
             <a href="{% url 'players:update' ranking.player.pk %}" class="tt-btn ghost sm icon-only" title="Editar">
               <i class="bi bi-pencil-fill"></i>
             </a>
             <a href="{% url 'players:delete' ranking.player.pk %}" class="tt-btn sm icon-only" style="background:transparent;color:#fca5a5;border:1.5px solid #fecaca" title="Excluir">
               <i class="bi bi-trash-fill"></i>
             </a>
+            {% endif %}
           </td>
         </tr>
         {% empty %}
@@ -50,9 +52,11 @@
             <div class="empty-state" style="padding:2rem">
               <div class="empty-icon"><i class="bi bi-person-x"></i></div>
               <p>Nenhum jogador {{ empty_label|lower }} cadastrado.</p>
+              {% if user.is_authenticated %}
               <a href="{% url 'players:create' %}" class="tt-btn primary sm mt-1">
                 <i class="bi bi-plus-lg"></i> Cadastrar Jogador
               </a>
+              {% endif %}
             </div>
           </td>
         </tr>

@@ -8,9 +8,11 @@
     <span class="page-icon"><i class="bi bi-trophy-fill"></i></span>
     Campeonatos
   </h2>
+  {% if user.is_authenticated %}
   <a href="{% url 'championships:create' %}" class="tt-btn primary">
     <i class="bi bi-plus-lg"></i> Novo Campeonato
   </a>
+  {% endif %}
 </div>
 
 <div class="tt-tabs" id="champTabs" role="tablist">
@@ -37,9 +39,11 @@
         <div class="empty-state">
           <div class="empty-icon"><i class="bi bi-trophy"></i></div>
           <p>Nenhum campeonato ativo no momento.</p>
+          {% if user.is_authenticated %}
           <a href="{% url 'championships:create' %}" class="tt-btn primary mt-2">
             <i class="bi bi-plus-lg"></i> Criar primeiro campeonato
           </a>
+          {% endif %}
         </div>
       </div>
       {% endfor %}

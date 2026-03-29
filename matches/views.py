@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.views.generic import UpdateView
@@ -8,7 +9,7 @@ from .forms import MatchResultForm
 from championships.services import advance_winner
 
 
-class MatchUpdateView(UpdateView):
+class MatchUpdateView(LoginRequiredMixin, UpdateView):
     model = Match
     form_class = MatchResultForm
     template_name = 'matches/form.html'

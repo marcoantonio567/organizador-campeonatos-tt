@@ -32,6 +32,27 @@
             <i class="bi bi-people-fill"></i> Jogadores
           </a>
         </li>
+        {% if user.is_authenticated %}
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'admins:list' %}">
+            <i class="bi bi-shield-lock-fill"></i> Admins
+          </a>
+        </li>
+        <li class="nav-item ms-1">
+          <form method="post" action="{% url 'logout' %}" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="tt-btn ghost sm" style="color:#fff;border-color:rgba(255,255,255,.35)">
+              <i class="bi bi-box-arrow-right"></i> Sair
+            </button>
+          </form>
+        </li>
+        {% else %}
+        <li class="nav-item ms-2">
+          <a href="{% url 'login' %}" class="tt-btn ghost sm" style="color:#fff;border-color:rgba(255,255,255,.35)">
+            <i class="bi bi-shield-lock-fill"></i> Admin
+          </a>
+        </li>
+        {% endif %}
       </ul>
     </div>
   </div>

@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, CreateView, UpdateView, DetailView, DeleteView, FormView, View
@@ -31,7 +32,7 @@ class ChampionshipListView(ListView):
         return ctx
 
 
-class ChampionshipCreateView(CreateView):
+class ChampionshipCreateView(LoginRequiredMixin, CreateView):
     model = Championship
     form_class = ChampionshipForm
     template_name = 'championships/form.html'
@@ -43,7 +44,7 @@ class ChampionshipCreateView(CreateView):
         return ctx
 
 
-class ChampionshipUpdateView(UpdateView):
+class ChampionshipUpdateView(LoginRequiredMixin, UpdateView):
     model = Championship
     form_class = ChampionshipForm
     template_name = 'championships/form.html'
@@ -54,7 +55,14 @@ class ChampionshipUpdateView(UpdateView):
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['title'] = f'Editar — {self.object.name}'
+        ctx['requires_password'] = True
         return ctx
+
+    def post(self, request, *args, **kwargs):
+        if request.POST.get('confirm_password') != '1234':
+            messages.error(request, 'Senha incorreta. As alterações não foram salvas.')
+            return redirect('championships:update', pk=kwargs['pk'])
+        return super().post(request, *args, **kwargs)
 
 
 class ChampionshipDetailView(DetailView):
@@ -89,14 +97,20 @@ class ChampionshipDetailView(DetailView):
         return ctx
 
 
-class ChampionshipDeleteView(DeleteView):
+class ChampionshipDeleteView(LoginRequiredMixin, DeleteView):
     model = Championship
     template_name = 'championships/confirm_delete.html'
     success_url = reverse_lazy('championships:list')
     context_object_name = 'championship'
 
+    def post(self, request, *args, **kwargs):
+        if request.POST.get('confirm_password') != '1234':
+            messages.error(request, 'Senha incorreta. O campeonato não foi excluído.')
+            return redirect('championships:delete', pk=kwargs['pk'])
+        return super().post(request, *args, **kwargs)
 
-class EnrollPlayerView(View):
+
+class EnrollPlayerView(LoginRequiredMixin, View):
     def post(self, request, pk):
         championship = get_object_or_404(Championship, pk=pk)
         form = EnrollPlayerForm(championship, request.POST)
@@ -119,7 +133,7 @@ class EnrollPlayerView(View):
         return redirect('championships:detail', pk=pk)
 
 
-class RemoveEnrollmentView(View):
+class RemoveEnrollmentView(LoginRequiredMixin, View):
     def post(self, request, pk, enrollment_pk):
         enrollment = get_object_or_404(Enrollment, pk=enrollment_pk, championship_id=pk)
         enrollment.delete()
@@ -127,7 +141,7 @@ class RemoveEnrollmentView(View):
         return redirect('championships:detail', pk=pk)
 
 
-class GenerateGroupsView(View):
+class GenerateGroupsView(LoginRequiredMixin, View):
     def post(self, request, pk):
         championship = get_object_or_404(Championship, pk=pk)
         if request.POST.get('confirm_password') != '1234':
@@ -186,7 +200,7 @@ class GroupsView(DetailView):
         return ctx
 
 
-class GenerateEliminationView(View):
+class GenerateEliminationView(LoginRequiredMixin, View):
     def post(self, request, pk):
         championship = get_object_or_404(Championship, pk=pk)
         try:
@@ -254,7 +268,7 @@ class BracketView(DetailView):
         return ctx
 
 
-class SwapBracketPlayersView(View):
+class SwapBracketPlayersView(LoginRequiredMixin, View):
     def post(self, request, pk):
         from django.db.models import Q
         championship = get_object_or_404(Championship, pk=pk)
@@ -331,7 +345,7 @@ class SwapBracketPlayersView(View):
         return redirect('championships:bracket', pk=pk)
 
 
-class MovePlayerGroupView(View):
+class MovePlayerGroupView(LoginRequiredMixin, View):
     def post(self, request, pk):
         from django.db.models import Q
         championship = get_object_or_404(Championship, pk=pk)

@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q, Sum
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
@@ -79,7 +80,7 @@ def _build_ranking_checked(post_data=None, player=None):
     return {cat_key: False for cat_key, _ in _CATEGORY_FIELD_MAP}
 
 
-class PlayerCreateView(CreateView):
+class PlayerCreateView(LoginRequiredMixin, CreateView):
     model = Player
     form_class = PlayerForm
     template_name = 'players/form.html'
@@ -107,7 +108,7 @@ class PlayerCreateView(CreateView):
         return redirect(self.success_url)
 
 
-class PlayerUpdateView(UpdateView):
+class PlayerUpdateView(LoginRequiredMixin, UpdateView):
     model = Player
     form_class = PlayerForm
     template_name = 'players/form.html'
@@ -146,7 +147,7 @@ class PlayerUpdateView(UpdateView):
         return redirect(self.success_url)
 
 
-class PlayerDeleteView(DeleteView):
+class PlayerDeleteView(LoginRequiredMixin, DeleteView):
     model = Player
     template_name = 'players/confirm_delete.html'
     success_url = reverse_lazy('players:list')

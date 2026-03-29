@@ -25,6 +25,17 @@
             {% endif %}
           </div>
           {% endfor %}
+          {% if requires_password %}
+          <div class="mb-3 pt-2 border-top">
+            <label class="tt-form-label" for="confirm_password">
+              <i class="bi bi-lock-fill me-1" style="color:var(--tt-danger)"></i> Senha de confirmação
+            </label>
+            <input type="password" name="confirm_password" id="confirm_password" class="tt-form-control" placeholder="••••" required>
+            <div class="mt-1" style="color:var(--tt-text-muted);font-size:.78rem">
+              <i class="bi bi-info-circle me-1"></i>Necessária para salvar alterações.
+            </div>
+          </div>
+          {% endif %}
           <div class="d-flex gap-2 mt-4">
             <button type="submit" class="tt-btn primary">
               <i class="bi bi-check-lg"></i> Salvar

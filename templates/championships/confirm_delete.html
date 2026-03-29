@@ -14,14 +14,22 @@
       <h4 class="mb-2">Confirmar Exclusão</h4>
       <p class="mb-1">Deseja excluir o campeonato <strong>{{ championship.name }}</strong>?</p>
       <p class="small mb-4" style="color:var(--tt-text-muted)">Todos os grupos, inscrições e partidas vinculados serão excluídos. <strong>Esta ação não pode ser desfeita.</strong></p>
-      <form method="post" class="d-flex gap-2 justify-content-center">
+      <form method="post">
         {% csrf_token %}
-        <button type="submit" class="tt-btn danger">
-          <i class="bi bi-trash-fill"></i> Sim, Excluir
-        </button>
-        <a href="{% url 'championships:detail' championship.pk %}" class="tt-btn ghost">
-          <i class="bi bi-x-lg"></i> Cancelar
-        </a>
+        <div class="mb-4 text-start mx-auto" style="max-width:280px">
+          <label class="tt-form-label" for="confirm_password">
+            <i class="bi bi-lock-fill me-1" style="color:var(--tt-danger)"></i> Senha de confirmação
+          </label>
+          <input type="password" name="confirm_password" id="confirm_password" class="tt-form-control" placeholder="••••" required autofocus>
+        </div>
+        <div class="d-flex gap-2 justify-content-center">
+          <button type="submit" class="tt-btn danger">
+            <i class="bi bi-trash-fill"></i> Sim, Excluir
+          </button>
+          <a href="{% url 'championships:detail' championship.pk %}" class="tt-btn ghost">
+            <i class="bi bi-x-lg"></i> Cancelar
+          </a>
+        </div>
       </form>
     </div>
   </div>

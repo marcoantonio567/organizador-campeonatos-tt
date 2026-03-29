@@ -8,9 +8,11 @@
     <span class="page-icon"><i class="bi bi-people-fill"></i></span>
     Jogadores
   </h2>
+  {% if user.is_authenticated %}
   <a href="{% url 'players:create' %}" class="tt-btn primary">
     <i class="bi bi-plus-lg"></i> Novo Jogador
   </a>
+  {% endif %}
 </div>
 
 <div class="tt-tabs" id="playerTabs" role="tablist">

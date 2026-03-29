@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Login Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center" style="min-height:60vh">
+  <div class="tt-card" style="width:100%;max-width:400px">
+    <div class="tt-card-header">
+      <span><i class="bi bi-shield-lock-fill me-2" style="color:var(--tt-primary)"></i>Acesso Administrador</span>
+    </div>
+    <div class="tt-card-body">
+      {% if form.errors %}
+      <div class="tt-alert danger mb-3">
+        <i class="bi bi-exclamation-circle-fill"></i>
+        <span>Usuário ou senha incorretos.</span>
+      </div>
+      {% endif %}
+
+      <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="tt-form-label" for="id_username">
+            <i class="bi bi-person-fill me-1"></i> Usuário
+          </label>
+          <input type="text" name="username" id="id_username" class="tt-form-control" autofocus required>
+        </div>
+        <div class="mb-4">
+          <label class="tt-form-label" for="id_password">
+            <i class="bi bi-lock-fill me-1"></i> Senha
+          </label>
+          <input type="password" name="password" id="id_password" class="tt-form-control" required>
+        </div>
+        <input type="hidden" name="next" value="{{ next }}">
+        <button type="submit" class="tt-btn primary w-100" style="justify-content:center">
+          <i class="bi bi-box-arrow-in-right"></i> Entrar
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
