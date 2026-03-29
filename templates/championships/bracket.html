@@ -55,6 +55,64 @@
 </div>
 {% endif %}
 
+<!-- Reorganizar posições da chave -->
+{% if not championship.is_finished %}
+{% if first_round_slots or first_round_slots_locked %}
+<div class="card mt-4">
+  <div class="card-header d-flex align-items-center gap-2">
+    <i class="bi bi-arrow-left-right"></i>
+    <strong>Reorganizar Posições</strong>
+    <small class="text-muted ms-1">— troca dois jogadores de posição na primeira rodada</small>
+  </div>
+  <div class="card-body">
+    {% if first_round_slots|length >= 2 %}
+    <form method="post" action="{% url 'championships:swap_bracket_players' championship.pk %}" class="row g-2 align-items-end mb-3">
+      {% csrf_token %}
+      <div class="col-auto">
+        <label class="form-label small text-muted mb-1">Jogador 1</label>
+        <select name="player1_id" class="form-select form-select-sm" required>
+          <option value="">Selecione...</option>
+          {% for slot in first_round_slots %}
+          <option value="{{ slot.player.pk }}">{{ slot.label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-auto d-flex align-items-end pb-1">
+        <i class="bi bi-arrow-left-right text-muted"></i>
+      </div>
+      <div class="col-auto">
+        <label class="form-label small text-muted mb-1">Jogador 2</label>
+        <select name="player2_id" class="form-select form-select-sm" required>
+          <option value="">Selecione...</option>
+          {% for slot in first_round_slots %}
+          <option value="{{ slot.player.pk }}">{{ slot.label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-auto">
+        <button type="submit" class="btn btn-warning btn-sm">
+          <i class="bi bi-arrow-left-right"></i> Trocar
+        </button>
+      </div>
+    </form>
+    {% elif first_round_slots|length == 1 %}
+    <p class="text-muted small mb-2">Apenas 1 jogador disponível para troca.</p>
+    {% else %}
+    <p class="text-muted small mb-2">Nenhum jogador disponível para troca.</p>
+    {% endif %}
+    {% if first_round_slots_locked %}
+    <div class="d-flex flex-wrap gap-2 align-items-center">
+      <small class="text-muted"><i class="bi bi-lock-fill"></i> Bloqueados (já jogaram):</small>
+      {% for slot in first_round_slots_locked %}
+      <span class="badge bg-secondary">{{ slot.player.name }}</span>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+{% endif %}
+
 <!-- Lista completa das partidas -->
 <div class="card mt-4">
   <div class="card-header"><strong>Todas as Partidas Eliminatórias</strong></div>

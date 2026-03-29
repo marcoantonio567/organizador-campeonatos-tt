@@ -33,6 +33,7 @@
           <thead class="table-standings">
             <tr>
               <th>#</th><th>Jogador</th><th>P</th><th>V</th><th>D</th><th>S+</th><th>S-</th><th>SD</th>
+              {% if not championship.is_finished %}<th></th>{% endif %}
             </tr>
           </thead>
           <tbody>
@@ -46,6 +47,33 @@
               <td>{{ standing.sets_won }}</td>
               <td>{{ standing.sets_lost }}</td>
               <td>{{ standing.sets_balance }}</td>
+              {% if not championship.is_finished %}
+              <td>
+                {% if groups|length > 1 %}
+                  {% if standing.player.pk in group.played_ids %}
+                  <span class="text-muted small" title="Já disputou partidas neste grupo — não pode ser movido">
+                    <i class="bi bi-lock-fill"></i>
+                  </span>
+                  {% else %}
+                  <form method="post" action="{% url 'championships:move_player_group' championship.pk %}" class="d-flex gap-1 align-items-center">
+                    {% csrf_token %}
+                    <input type="hidden" name="player_id" value="{{ standing.player.pk }}">
+                    <input type="hidden" name="source_group_id" value="{{ group.pk }}">
+                    <select name="target_group_id" class="form-select form-select-sm" style="width:auto" title="Mover para grupo">
+                      {% for g in groups %}
+                        {% if g.pk != group.pk %}
+                        <option value="{{ g.pk }}">→ Grupo {{ g.name }}</option>
+                        {% endif %}
+                      {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-sm btn-outline-warning" title="Mover jogador">
+                      <i class="bi bi-arrow-left-right"></i>
+                    </button>
+                  </form>
+                  {% endif %}
+                {% endif %}
+              </td>
+              {% endif %}
             </tr>
             {% endfor %}
           </tbody>

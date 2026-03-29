@@ -15,4 +15,6 @@ urlpatterns = [
     path('<int:pk>/grupos/', views.GroupsView.as_view(), name='groups'),
     path('<int:pk>/gerar-chave/', views.GenerateEliminationView.as_view(), name='generate_elimination'),
     path('<int:pk>/chave/', views.BracketView.as_view(), name='bracket'),
+    path('<int:pk>/mover-jogador-grupo/', views.MovePlayerGroupView.as_view(), name='move_player_group'),
+    path('<int:pk>/trocar-jogadores-chave/', views.SwapBracketPlayersView.as_view(), name='swap_bracket_players'),
 ]
