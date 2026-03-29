@@ -1,146 +1,204 @@
 {% extends 'base.html' %}
 {% block title %}Grupos — {{ championship.name }}{% endblock %}
+{% block nav_championships %}active{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h2><i class="bi bi-grid"></i> Grupos — {{ championship.name }}</h2>
-  <div class="d-flex gap-2">
-    <a href="{% url 'championships:detail' championship.pk %}" class="btn btn-outline-secondary btn-sm">
-      <i class="bi bi-arrow-left"></i> Voltar
-    </a>
-    {% if not championship.is_finished %}
-    <form method="post" action="{% url 'championships:generate_elimination' championship.pk %}">
-      {% csrf_token %}
-      <button class="btn btn-danger btn-sm">
-        <i class="bi bi-diagram-3"></i> Gerar Chave
-      </button>
-    </form>
-    {% endif %}
-  </div>
+<a href="{% url 'championships:detail' championship.pk %}" class="tt-back-link">
+  <i class="bi bi-arrow-left"></i> Voltar ao Campeonato
+</a>
+
+<div class="tt-page-header">
+  <h2>
+    <span class="page-icon"><i class="bi bi-grid-3x3-gap-fill"></i></span>
+    Grupos — <span style="color:var(--tt-text-muted);font-weight:500">{{ championship.name }}</span>
+  </h2>
+  {% if not championship.is_finished %}
+  <form method="post" action="{% url 'championships:generate_elimination' championship.pk %}">
+    {% csrf_token %}
+    <button class="tt-btn danger">
+      <i class="bi bi-diagram-3-fill"></i> Gerar Chave Eliminatória
+    </button>
+  </form>
+  {% endif %}
 </div>
 
 {% for group in groups %}
-<div class="card mb-4">
-  <div class="card-header d-flex justify-content-between align-items-center">
-    <h5 class="mb-0">Grupo {{ group.name }}</h5>
-    {% if championship.categoria == 'avancado' %}
-      {% for standing in group.standings.all %}
-        {% if standing.player.pk in seed_ids %}
-        <span class="badge text-bg-warning">
-          <i class="bi bi-trophy-fill me-1"></i>Cabeça: {{ standing.player.name }}
-        </span>
-        {% endif %}
-      {% endfor %}
-    {% endif %}
+<div class="tt-card mb-4">
+  <div class="tt-card-header">
+    <span>
+      <i class="bi bi-grid-fill me-2" style="color:var(--tt-accent)"></i>
+      Grupo {{ group.name }}
+    </span>
+    <div class="d-flex gap-2 align-items-center">
+      {% if championship.categoria == 'avancado' %}
+        {% for standing in group.standings.all %}
+          {% if standing.player.pk in seed_ids %}
+          <span class="tt-badge semente">
+            <i class="bi bi-trophy-fill"></i> Cabeça: {{ standing.player.name }}
+          </span>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+      <!-- Group match progress -->
+      {% with total=group.matches.count done=group.matches.filter_done %}
+      <span class="text-muted small">
+        <i class="bi bi-check2-circle me-1"></i>
+        {{ group.matches.all|length }} partida{{ group.matches.all|length|pluralize:"s" }}
+      </span>
+      {% endwith %}
+    </div>
   </div>
-  <div class="card-body">
-    <div class="row g-3">
-      <!-- Classificação -->
-      <div class="col-md-5">
-        <h6 class="text-muted mb-2">Classificação</h6>
-        <table class="table table-sm">
-          <thead class="table-standings">
-            <tr>
-              <th>#</th><th>Jogador</th><th>P</th><th>V</th><th>D</th><th>S+</th><th>S-</th><th>SD</th>
-              {% if not championship.is_finished %}<th></th>{% endif %}
-            </tr>
-          </thead>
-          <tbody>
-            {% for standing in group.standings.all %}
-            <tr {% if forloop.counter <= 2 %}class="table-success"{% endif %}>
-              <td>{{ forloop.counter }}</td>
-              <td>
-                {{ standing.player.name }}
-                {% if championship.categoria == 'avancado' and standing.player.pk in seed_ids %}
-                  <i class="bi bi-trophy-fill text-warning ms-1" title="Cabeça de Chave"></i>
-                {% endif %}
-              </td>
-              <td><strong>{{ standing.points }}</strong></td>
-              <td>{{ standing.wins }}</td>
-              <td>{{ standing.losses }}</td>
-              <td>{{ standing.sets_won }}</td>
-              <td>{{ standing.sets_lost }}</td>
-              <td>{{ standing.sets_balance }}</td>
-              {% if not championship.is_finished %}
-              <td>
-                {% if groups|length > 1 %}
-                  {% if standing.player.pk in group.played_ids %}
-                  <span class="text-muted small" title="Já disputou partidas neste grupo — não pode ser movido">
-                    <i class="bi bi-lock-fill"></i>
-                  </span>
-                  {% else %}
-                  <form method="post" action="{% url 'championships:move_player_group' championship.pk %}" class="d-flex gap-1 align-items-center">
-                    {% csrf_token %}
-                    <input type="hidden" name="player_id" value="{{ standing.player.pk }}">
-                    <input type="hidden" name="source_group_id" value="{{ group.pk }}">
-                    <select name="target_group_id" class="form-select form-select-sm" style="width:auto" title="Mover para grupo">
-                      {% for g in groups %}
-                        {% if g.pk != group.pk %}
-                        <option value="{{ g.pk }}">→ Grupo {{ g.name }}</option>
-                        {% endif %}
-                      {% endfor %}
-                    </select>
-                    <button type="submit" class="btn btn-sm btn-outline-warning" title="Mover jogador">
-                      <i class="bi bi-arrow-left-right"></i>
-                    </button>
-                  </form>
-                  {% endif %}
-                {% endif %}
-              </td>
-              {% endif %}
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-        <small class="text-success">■ Classificado | P=Pts V=Vitórias D=Derrotas SD=Saldo de Sets</small>
-        <small class="text-success" style="display:block"> S+=Sets Ganhas S-=Sets Perdidas</small>
 
+  <div class="tt-card-body">
+    <div class="row g-4">
+      <!-- Classificação -->
+      <div class="col-lg-5">
+        <p class="small fw-bold mb-2" style="color:var(--tt-text-muted);text-transform:uppercase;letter-spacing:.06em">
+          <i class="bi bi-list-ol me-1"></i> Classificação
+        </p>
+        <div style="overflow-x:auto">
+          <table class="tt-table">
+            <thead>
+              <tr>
+                <th style="width:36px">#</th>
+                <th>Jogador</th>
+                <th title="Pontos" style="width:36px">P</th>
+                <th title="Vitórias" style="width:36px">V</th>
+                <th title="Derrotas" style="width:36px">D</th>
+                <th title="Sets Ganhos" style="width:36px">S+</th>
+                <th title="Sets Perdidos" style="width:36px">S-</th>
+                <th title="Saldo de Sets" style="width:40px">SD</th>
+                {% if not championship.is_finished %}<th style="width:100px"></th>{% endif %}
+              </tr>
+            </thead>
+            <tbody>
+              {% for standing in group.standings.all %}
+              <tr class="{% if forloop.counter <= 2 %}qualified{% endif %} {% if forloop.counter == 1 %}qualified-1{% elif forloop.counter == 2 %}qualified-2{% elif forloop.counter == 3 %}qualified-3{% endif %}">
+                <td>
+                  {% if forloop.counter == 1 %}
+                    <span class="pos-medal gold">1</span>
+                  {% elif forloop.counter == 2 %}
+                    <span class="pos-medal silver">2</span>
+                  {% elif forloop.counter == 3 %}
+                    <span class="pos-medal bronze">3</span>
+                  {% else %}
+                    <span class="pos-medal other">{{ forloop.counter }}</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="player-avatar" style="width:26px;height:26px;font-size:.62rem">
+                      {{ standing.player.name|slice:":2"|upper }}
+                    </span>
+                    <span class="fw-semibold" style="font-size:.875rem">{{ standing.player.name }}</span>
+                    {% if championship.categoria == 'avancado' and standing.player.pk in seed_ids %}
+                      <i class="bi bi-trophy-fill" style="color:var(--tt-accent);font-size:.75rem" title="Cabeça de Chave"></i>
+                    {% endif %}
+                  </div>
+                </td>
+                <td><strong style="color:var(--tt-primary)">{{ standing.points }}</strong></td>
+                <td class="text-success">{{ standing.wins }}</td>
+                <td class="text-danger">{{ standing.losses }}</td>
+                <td>{{ standing.sets_won }}</td>
+                <td>{{ standing.sets_lost }}</td>
+                <td><strong>{{ standing.sets_balance }}</strong></td>
+                {% if not championship.is_finished %}
+                <td>
+                  {% if groups|length > 1 %}
+                    {% if standing.player.pk in group.played_ids %}
+                    <span title="Já disputou partidas — não pode ser movido" style="color:#94a3b8;font-size:.85rem">
+                      <i class="bi bi-lock-fill"></i>
+                    </span>
+                    {% else %}
+                    <form method="post" action="{% url 'championships:move_player_group' championship.pk %}" class="d-flex gap-1 align-items-center">
+                      {% csrf_token %}
+                      <input type="hidden" name="player_id" value="{{ standing.player.pk }}">
+                      <input type="hidden" name="source_group_id" value="{{ group.pk }}">
+                      <select name="target_group_id" class="form-select form-select-sm py-0" style="width:auto;font-size:.78rem;height:28px" title="Mover para grupo">
+                        {% for g in groups %}
+                          {% if g.pk != group.pk %}
+                          <option value="{{ g.pk }}">→ Grupo {{ g.name }}</option>
+                          {% endif %}
+                        {% endfor %}
+                      </select>
+                      <button type="submit" class="tt-btn ghost sm icon-only" title="Mover jogador" style="height:28px;padding:.2rem .45rem">
+                        <i class="bi bi-arrow-left-right"></i>
+                      </button>
+                    </form>
+                    {% endif %}
+                  {% endif %}
+                </td>
+                {% endif %}
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="d-flex gap-3 mt-2" style="font-size:.75rem;color:var(--tt-text-muted)">
+          <span><span style="color:var(--tt-success)">■</span> Classificado</span>
+          <span>P=Pontos · V=Vitórias · D=Derrotas · SD=Saldo</span>
+        </div>
       </div>
 
       <!-- Partidas -->
-      <div class="col-md-7">
-        <h6 class="text-muted mb-2">Partidas</h6>
-        <table class="table table-sm">
-          <thead>
-            <tr><th>Jogador A</th><th>Placar</th><th>Jogador B</th><th>Status</th><th></th></tr>
-          </thead>
-          <tbody>
-            {% for match in group.matches.all %}
-            <tr>
-              <td {% if match.winner == match.player_a %}class="fw-bold text-success"{% endif %}>
-                {{ match.player_a }}
-              </td>
-              <td class="text-center">
-                {% if match.status == 'finalizada' %}
-                  <span class="badge bg-dark">{{ match.score_a }} × {{ match.score_b }}</span>
-                {% else %}
-                  <span class="text-muted">vs</span>
-                {% endif %}
-              </td>
-              <td {% if match.winner == match.player_b %}class="fw-bold text-success"{% endif %}>
-                {{ match.player_b }}
-              </td>
-              <td>
-                {% if match.status == 'finalizada' %}
-                  <span class="badge bg-success">Finalizada</span>
-                {% else %}
-                  <span class="badge bg-warning text-dark">Pendente</span>
-                {% endif %}
-              </td>
-              <td>
-                <a href="{% url 'matches:update' match.pk %}" class="btn btn-sm btn-outline-primary">
-                  <i class="bi bi-pencil-square"></i>
-                </a>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+      <div class="col-lg-7">
+        <p class="small fw-bold mb-2" style="color:var(--tt-text-muted);text-transform:uppercase;letter-spacing:.06em">
+          <i class="bi bi-controller me-1"></i> Partidas
+        </p>
+        <div style="overflow-x:auto">
+          <table class="tt-table">
+            <thead>
+              <tr>
+                <th>Jogador A</th>
+                <th class="text-center" style="width:80px">Placar</th>
+                <th>Jogador B</th>
+                <th style="width:90px">Status</th>
+                <th style="width:44px"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for match in group.matches.all %}
+              <tr>
+                <td class="{% if match.winner == match.player_a %}fw-bold text-success{% endif %}">
+                  {{ match.player_a }}
+                </td>
+                <td class="text-center">
+                  {% if match.status == 'finalizada' %}
+                    <span class="tt-badge finalizado fw-bold" style="font-size:.82rem;background:#1e293b;color:#f8fafc">
+                      {{ match.score_a }}&nbsp;×&nbsp;{{ match.score_b }}
+                    </span>
+                  {% else %}
+                    <span style="color:#94a3b8;font-size:.85rem">vs</span>
+                  {% endif %}
+                </td>
+                <td class="{% if match.winner == match.player_b %}fw-bold text-success{% endif %}">
+                  {{ match.player_b }}
+                </td>
+                <td>
+                  {% if match.status == 'finalizada' %}
+                    <span class="tt-badge concluida"><i class="bi bi-check-circle-fill"></i> Finalizada</span>
+                  {% else %}
+                    <span class="tt-badge pendente"><i class="bi bi-clock-fill"></i> Pendente</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <a href="{% url 'matches:update' match.pk %}" class="tt-btn ghost sm icon-only" title="Registrar resultado">
+                    <i class="bi bi-pencil-fill"></i>
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
 </div>
 {% empty %}
-<div class="alert alert-warning">Nenhum grupo gerado ainda. Volte ao campeonato e gere os grupos.</div>
+<div class="tt-alert warning">
+  <i class="bi bi-exclamation-triangle-fill"></i>
+  <span>Nenhum grupo gerado ainda. <a href="{% url 'championships:detail' championship.pk %}">Volte ao campeonato</a> e gere os grupos.</span>
+</div>
 {% endfor %}
 {% endblock %}

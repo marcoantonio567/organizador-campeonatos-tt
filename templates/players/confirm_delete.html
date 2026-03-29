@@ -1,20 +1,28 @@
 {% extends 'base.html' %}
 {% block title %}Excluir Jogador{% endblock %}
+{% block nav_players %}active{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-  <div class="col-md-5">
-    <div class="card border-danger">
-      <div class="card-header bg-danger text-white"><h5 class="mb-0">Confirmar Exclusão</h5></div>
-      <div class="card-body">
-        <p>Deseja excluir o jogador <strong>{{ player.name }}</strong>?</p>
-        <p class="text-muted small">Esta ação não pode ser desfeita.</p>
-        <form method="post" class="d-flex gap-2">
-          {% csrf_token %}
-          <button type="submit" class="btn btn-danger">Excluir</button>
-          <a href="{% url 'players:list' %}" class="btn btn-outline-secondary">Cancelar</a>
-        </form>
-      </div>
+<a href="{% url 'players:list' %}" class="tt-back-link">
+  <i class="bi bi-arrow-left"></i> Voltar
+</a>
+
+<div class="delete-card">
+  <div class="tt-card">
+    <div class="tt-card-body" style="text-align:center;padding:2rem 1.5rem">
+      <div class="delete-icon"><i class="bi bi-person-x-fill"></i></div>
+      <h4 class="mb-2">Confirmar Exclusão</h4>
+      <p class="mb-1">Deseja excluir o jogador <strong>{{ player.name }}</strong>?</p>
+      <p class="small mb-4" style="color:var(--tt-text-muted)"><strong>Esta ação não pode ser desfeita.</strong></p>
+      <form method="post" class="d-flex gap-2 justify-content-center">
+        {% csrf_token %}
+        <button type="submit" class="tt-btn danger">
+          <i class="bi bi-person-x-fill"></i> Sim, Excluir
+        </button>
+        <a href="{% url 'players:list' %}" class="tt-btn ghost">
+          <i class="bi bi-x-lg"></i> Cancelar
+        </a>
+      </form>
     </div>
   </div>
 </div>

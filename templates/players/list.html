@@ -1,31 +1,53 @@
 {% extends 'base.html' %}
 {% block title %}Jogadores{% endblock %}
+{% block nav_players %}active{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h2><i class="bi bi-people"></i> Jogadores</h2>
-  <a href="{% url 'players:create' %}" class="btn btn-primary">
+<div class="tt-page-header">
+  <h2>
+    <span class="page-icon"><i class="bi bi-people-fill"></i></span>
+    Jogadores
+  </h2>
+  <a href="{% url 'players:create' %}" class="tt-btn primary">
     <i class="bi bi-plus-lg"></i> Novo Jogador
   </a>
 </div>
 
-<ul class="nav nav-tabs mb-0" id="categoryTabs" role="tablist">
+<div class="tt-tabs" id="playerTabs" role="tablist">
   {% for key, label, group in categories %}
-  <li class="nav-item" role="presentation">
-    <button class="nav-link {% if forloop.first %}active{% endif %}"
-            data-bs-toggle="tab" data-bs-target="#tab-{{ key }}" type="button">
-      {{ label }}
-      <span class="badge bg-secondary ms-1">{{ group.count }}</span>
-    </button>
-  </li>
+  <button class="tt-tab-btn {% if forloop.first %}active{% endif %}"
+          data-target="tab-{{ key }}" type="button" role="tab">
+    {% if key == 'iniciante' %}
+      <i class="bi bi-star" style="color:var(--tt-success)"></i>
+    {% elif key == 'intermediario' %}
+      <i class="bi bi-star-half" style="color:var(--tt-accent)"></i>
+    {% else %}
+      <i class="bi bi-star-fill" style="color:var(--tt-danger)"></i>
+    {% endif %}
+    {{ label }}
+    <span class="tt-badge {% if key == 'iniciante' %}iniciante{% elif key == 'intermediario' %}intermediario{% else %}avancado{% endif %} ms-1">{{ group.count }}</span>
+  </button>
   {% endfor %}
-</ul>
+</div>
 
-<div class="tab-content">
+<div class="tt-tab-content">
   {% for key, label, group in categories %}
-  <div class="tab-pane fade {% if forloop.first %}show active{% endif %}" id="tab-{{ key }}">
-    {% include 'players/_table.html' with ranking_list=group empty_label=label %}
+  <div class="tt-tab-pane {% if forloop.first %}show{% endif %}" id="tab-{{ key }}">
+    {% include 'players/_table.html' with ranking_list=group empty_label=label category_key=key %}
   </div>
   {% endfor %}
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.querySelectorAll('.tt-tab-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.tt-tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tt-tab-pane').forEach(p => p.classList.remove('show'));
+    this.classList.add('active');
+    document.getElementById(this.dataset.target).classList.add('show');
+  });
+});
+</script>
 {% endblock %}

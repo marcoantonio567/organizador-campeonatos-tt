@@ -1,68 +1,74 @@
 {% extends 'base.html' %}
 {% block title %}{{ championship.name }}{% endblock %}
+{% block nav_championships %}active{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
+<a href="{% url 'championships:list' %}" class="tt-back-link">
+  <i class="bi bi-arrow-left"></i> Voltar aos Campeonatos
+</a>
+
+<div class="tt-page-header">
   <div>
-    <h2 class="mb-0">{{ championship.name }}</h2>
-    <div class="mt-1 d-flex gap-1 flex-wrap">
+    <h2 style="font-size:1.7rem">{{ championship.name }}</h2>
+    <div class="d-flex gap-2 mt-1 flex-wrap">
       {% if championship.categoria == 'iniciante' %}
-        <span class="badge text-bg-success">{{ championship.get_categoria_display }}</span>
+        <span class="tt-badge iniciante"><i class="bi bi-star"></i> {{ championship.get_categoria_display }}</span>
       {% elif championship.categoria == 'intermediario' %}
-        <span class="badge text-bg-warning">{{ championship.get_categoria_display }}</span>
+        <span class="tt-badge intermediario"><i class="bi bi-star-half"></i> {{ championship.get_categoria_display }}</span>
       {% else %}
-        <span class="badge text-bg-danger">{{ championship.get_categoria_display }}</span>
+        <span class="tt-badge avancado"><i class="bi bi-star-fill"></i> {{ championship.get_categoria_display }}</span>
       {% endif %}
       {% if championship.is_finished %}
-        <span class="badge bg-secondary">Finalizado</span>
+        <span class="tt-badge finalizado"><i class="bi bi-check-circle-fill"></i> Finalizado</span>
       {% else %}
-        <span class="badge bg-primary">Ativo</span>
+        <span class="tt-badge ativo"><i class="bi bi-circle-fill" style="font-size:.5em"></i> Ativo</span>
       {% endif %}
     </div>
   </div>
-  <div class="d-flex gap-2">
-    <a href="{% url 'championships:update' championship.pk %}" class="btn btn-outline-secondary btn-sm">
-      <i class="bi bi-pencil"></i> Editar
-    </a>
-    <a href="{% url 'championships:delete' championship.pk %}" class="btn btn-outline-danger btn-sm">
-      <i class="bi bi-trash"></i> Excluir
-    </a>
+  <div class="d-flex gap-2 flex-wrap">
     {% if championship.groups.exists %}
-    <a href="{% url 'championships:groups' championship.pk %}" class="btn btn-outline-primary btn-sm">
-      <i class="bi bi-grid"></i> Grupos
+    <a href="{% url 'championships:groups' championship.pk %}" class="tt-btn ghost sm">
+      <i class="bi bi-grid-3x3-gap"></i> Grupos
     </a>
     {% endif %}
     {% if has_bracket %}
-    <a href="{% url 'championships:bracket' championship.pk %}" class="btn btn-outline-danger btn-sm">
-      <i class="bi bi-diagram-3"></i> Chave
+    <a href="{% url 'championships:bracket' championship.pk %}" class="tt-btn ghost sm">
+      <i class="bi bi-diagram-3-fill"></i> Chave
     </a>
     {% endif %}
+    <a href="{% url 'championships:update' championship.pk %}" class="tt-btn ghost sm">
+      <i class="bi bi-pencil-fill"></i> Editar
+    </a>
+    <a href="{% url 'championships:delete' championship.pk %}" class="tt-btn sm" style="background:#fee2e2;color:var(--tt-danger);border:1.5px solid #fecaca">
+      <i class="bi bi-trash-fill"></i> Excluir
+    </a>
   </div>
 </div>
 
+<!-- Stat Cards -->
 <div class="row g-3 mb-4">
-  <div class="col-md-4">
-    <div class="card">
-      <div class="card-body text-center">
-        <div class="h4 fw-bold">{{ enrollments.count }}</div>
-        <div class="text-muted">Inscritos</div>
-      </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card primary">
+      <div class="stat-value">{{ enrollments.count }}</div>
+      <div class="stat-label"><i class="bi bi-people-fill me-1"></i>Inscritos</div>
     </div>
   </div>
-  <div class="col-md-4">
-    <div class="card">
-      <div class="card-body text-center">
-        <div class="h4 fw-bold">{{ championship.local }}</div>
-        <div class="text-muted">Local</div>
-      </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card">
+      <div class="stat-value" style="font-size:1.1rem;padding-top:.4rem">{{ championship.local }}</div>
+      <div class="stat-label"><i class="bi bi-geo-alt-fill me-1"></i>Local</div>
     </div>
   </div>
-  <div class="col-md-4">
-    <div class="card">
-      <div class="card-body text-center">
-        <div class="h4 fw-bold">{{ championship.data_inicio }}</div>
-        <div class="text-muted">Data</div>
-      </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card">
+      <div class="stat-value" style="font-size:1.1rem;padding-top:.4rem">{{ championship.data_inicio }}</div>
+      <div class="stat-label"><i class="bi bi-calendar-event-fill me-1"></i>Data</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card {% if championship.groups.exists %}success{% endif %}">
+      <div class="stat-value">{{ championship.groups.count }}</div>
+      <div class="stat-label"><i class="bi bi-grid-3x3-gap me-1"></i>Grupos</div>
     </div>
   </div>
 </div>
@@ -70,57 +76,73 @@
 <div class="row g-4">
   <!-- Inscritos -->
   <div class="col-md-6">
-    <div class="card">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <strong>Inscritos</strong>
-        <span class="badge bg-secondary">{{ enrollments|length }}</span>
+    <div class="tt-card h-100">
+      <div class="tt-card-header">
+        <span><i class="bi bi-people-fill me-2 text-primary"></i>Inscritos</span>
+        <span class="tt-badge ativo">{{ enrollments|length }}</span>
       </div>
+
       {% if championship.categoria == 'avancado' and enrollments %}
-      <div class="alert alert-warning alert-sm mb-0 py-2 px-3 rounded-0 border-0 border-bottom small">
-        <i class="bi bi-trophy-fill text-warning"></i>
-        <strong>Cabeças de Chave:</strong> ao gerar os grupos, os <strong>N primeiros do ranking</strong>
-        (onde N = nº de grupos) serão distribuídos um por grupo.
+      <div class="d-flex align-items-start gap-2 px-3 py-2 border-bottom" style="background:#fffbeb;font-size:.82rem;color:#92400e">
+        <i class="bi bi-trophy-fill" style="color:var(--tt-accent);flex-shrink:0;margin-top:.15rem"></i>
+        <span><strong>Cabeças de Chave:</strong> ao gerar os grupos, os <strong>N primeiros do ranking</strong> (N = nº de grupos) serão distribuídos um por grupo.</span>
       </div>
       {% endif %}
-      <div class="card-body p-0">
-        <table class="table table-sm mb-0">
+
+      <div class="tt-card-body p-0">
+        <table class="tt-table">
           <thead>
-            {% if championship.categoria == 'avancado' %}
-            <tr><th>#</th><th>Jogador</th><th class="text-end">Pts Ranking</th><th></th></tr>
-            {% else %}
-            <tr><th>#</th><th>Jogador</th><th></th></tr>
-            {% endif %}
+            <tr>
+              <th style="width:40px">#</th>
+              <th>Jogador</th>
+              {% if championship.categoria == 'avancado' %}
+              <th class="text-end">Pts</th>
+              {% endif %}
+              <th style="width:40px"></th>
+            </tr>
           </thead>
           <tbody>
             {% for enrollment in enrollments %}
-            <tr {% if championship.categoria == 'avancado' and forloop.counter <= championship.groups.count and championship.groups.exists %}class="table-warning"{% endif %}>
-              <td class="text-muted">
+            <tr>
+              <td>
                 {% if championship.categoria == 'avancado' and enrollment.player.pk in seed_player_ids %}
-                  <i class="bi bi-trophy-fill text-warning" title="Cabeça de Chave"></i>
+                  <i class="bi bi-trophy-fill" style="color:var(--tt-accent)" title="Cabeça de Chave"></i>
                 {% else %}
-                  {{ forloop.counter }}
+                  <span class="text-muted small">{{ forloop.counter }}</span>
                 {% endif %}
               </td>
               <td>
-                {{ enrollment.player.name }}
-                {% if championship.categoria == 'avancado' and enrollment.player.pk in seed_player_ids %}
-                  <span class="badge text-bg-warning ms-1 small">Cabeça de Chave</span>
-                {% endif %}
+                <div class="d-flex align-items-center gap-2">
+                  <span class="player-avatar" style="width:26px;height:26px;font-size:.65rem">
+                    {{ enrollment.player.name|slice:":2"|upper }}
+                  </span>
+                  <span class="fw-semibold">{{ enrollment.player.name }}</span>
+                  {% if championship.categoria == 'avancado' and enrollment.player.pk in seed_player_ids %}
+                    <span class="tt-badge semente" style="font-size:.68rem">Cabeça</span>
+                  {% endif %}
+                </div>
               </td>
               {% if championship.categoria == 'avancado' %}
-              <td class="text-end fw-bold">{{ enrollment.avancado_pontos }} pts</td>
+              <td class="text-end fw-bold" style="color:var(--tt-primary)">{{ enrollment.avancado_pontos }}</td>
               {% endif %}
               <td>
                 <form method="post" action="{% url 'championships:remove_enrollment' championship.pk enrollment.pk %}" class="d-inline">
                   {% csrf_token %}
-                  <button type="submit" class="btn btn-link btn-sm text-danger p-0">
+                  <button type="submit" class="tt-btn sm icon-only" style="background:transparent;color:#94a3b8;border:none" title="Remover inscrição">
                     <i class="bi bi-x-lg"></i>
                   </button>
                 </form>
               </td>
             </tr>
             {% empty %}
-            <tr><td colspan="4" class="text-muted text-center py-3">Nenhum inscrito.</td></tr>
+            <tr>
+              <td colspan="4">
+                <div class="empty-state" style="padding:1.5rem">
+                  <div class="empty-icon" style="font-size:1.8rem"><i class="bi bi-person-x"></i></div>
+                  <p>Nenhum inscrito ainda.</p>
+                </div>
+              </td>
+            </tr>
             {% endfor %}
           </tbody>
         </table>
@@ -130,86 +152,115 @@
 
   <!-- Ações -->
   <div class="col-md-6">
-    <!-- Inscrever jogadores -->
     {% if not championship.is_finished %}
-    <div class="card mb-3">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <strong>Inscrever Jogadores</strong>
-        <span class="badge text-bg-secondary">{{ championship.get_categoria_display }}</span>
+
+    <!-- Inscrever jogadores -->
+    <div class="tt-card mb-3">
+      <div class="tt-card-header">
+        <span><i class="bi bi-person-plus-fill me-2" style="color:var(--tt-success)"></i>Inscrever Jogadores</span>
+        {% if championship.categoria == 'iniciante' %}
+          <span class="tt-badge iniciante">{{ championship.get_categoria_display }}</span>
+        {% elif championship.categoria == 'intermediario' %}
+          <span class="tt-badge intermediario">{{ championship.get_categoria_display }}</span>
+        {% else %}
+          <span class="tt-badge avancado">{{ championship.get_categoria_display }}</span>
+        {% endif %}
       </div>
-      <div class="card-body p-0">
+      <div class="tt-card-body p-0">
         {% if enroll_form.players.field.queryset.exists %}
         <form method="post" action="{% url 'championships:enroll' championship.pk %}">
           {% csrf_token %}
-          <div class="px-3 pt-3 pb-1 border-bottom d-flex gap-2">
-            <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-select-all">Selecionar todos</button>
-            <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-deselect-all">Limpar</button>
+          <div class="d-flex gap-2 px-3 pt-2 pb-2 border-bottom">
+            <button type="button" class="tt-btn ghost sm" id="btn-select-all">
+              <i class="bi bi-check2-all"></i> Todos
+            </button>
+            <button type="button" class="tt-btn ghost sm" id="btn-deselect-all">
+              <i class="bi bi-x-lg"></i> Limpar
+            </button>
           </div>
-          <ul class="list-group list-group-flush" id="enroll-list" style="max-height:260px;overflow-y:auto;">
+          <div class="enroll-list" id="enroll-list">
             {% for player in enroll_form.players.field.queryset %}
-            <li class="list-group-item px-3 py-2">
-              <div class="form-check d-flex justify-content-between align-items-center">
-                <div>
-                  <input class="form-check-input enroll-check me-2" type="checkbox"
-                         name="players" value="{{ player.pk }}" id="ep_{{ player.pk }}">
-                  <label class="form-check-label" for="ep_{{ player.pk }}">{{ player.name }}</label>
-                </div>
-                {% with ranking=player.category_rankings.all %}
-                {% for r in ranking %}{% if r.categoria == championship.categoria %}
-                  <span class="badge bg-secondary">{{ r.pontos }} pts</span>
-                {% endif %}{% endfor %}
-                {% endwith %}
-              </div>
-            </li>
+            <label class="enroll-item" for="ep_{{ player.pk }}">
+              <input class="enroll-check" type="checkbox" name="players" value="{{ player.pk }}" id="ep_{{ player.pk }}">
+              <span class="player-avatar" style="width:26px;height:26px;font-size:.65rem;flex-shrink:0">
+                {{ player.name|slice:":2"|upper }}
+              </span>
+              <span>{{ player.name }}</span>
+              {% with ranking=player.category_rankings.all %}
+              {% for r in ranking %}{% if r.categoria == championship.categoria %}
+                <span class="tt-badge finalizado ms-auto" style="font-size:.7rem">{{ r.pontos }} pts</span>
+              {% endif %}{% endfor %}
+              {% endwith %}
+            </label>
             {% endfor %}
-          </ul>
+          </div>
           <div class="px-3 py-2 border-top">
-            <button type="submit" class="btn btn-primary btn-sm w-100">
-              <i class="bi bi-person-plus"></i> Inscrever Selecionados
+            <button type="submit" class="tt-btn primary w-100" style="justify-content:center">
+              <i class="bi bi-person-check-fill"></i> Inscrever Selecionados
             </button>
           </div>
         </form>
         {% else %}
-        <div class="text-muted text-center py-4 small">
-          Todos os jogadores da categoria <strong>{{ championship.get_categoria_display }}</strong> já estão inscritos.
+        <div class="empty-state" style="padding:1.5rem">
+          <div class="empty-icon" style="font-size:1.8rem"><i class="bi bi-check2-circle"></i></div>
+          <p>Todos os jogadores da categoria <strong>{{ championship.get_categoria_display }}</strong> já estão inscritos.</p>
         </div>
         {% endif %}
       </div>
     </div>
 
     <!-- Gerar Grupos -->
-    <div class="card mb-3">
-      <div class="card-header"><strong>Gerar Fase de Grupos</strong></div>
-      <div class="card-body">
+    <div class="tt-card mb-3">
+      <div class="tt-card-header">
+        <span><i class="bi bi-grid-3x3-gap-fill me-2" style="color:var(--tt-accent)"></i>Gerar Fase de Grupos</span>
+      </div>
+      <div class="tt-card-body">
         <form method="post" action="{% url 'championships:generate_groups' championship.pk %}" class="d-flex gap-2 align-items-end">
           {% csrf_token %}
-          <div>
-            <label class="form-label mb-1 small">Nº de grupos</label>
+          <div class="flex-grow-1">
+            <label class="tt-form-label">Nº de grupos</label>
             {{ generate_groups_form.num_groups }}
           </div>
-          <button type="submit" class="btn btn-warning btn-sm">Gerar Grupos</button>
+          <button type="submit" class="tt-btn accent">
+            <i class="bi bi-grid-3x3-gap"></i> Gerar
+          </button>
         </form>
-        <small class="text-muted">⚠️ Isso apagará grupos existentes e recriará tudo.</small>
+        <p class="small mt-2 mb-0" style="color:var(--tt-text-muted)">
+          <i class="bi bi-exclamation-triangle-fill me-1" style="color:var(--tt-warning)"></i>
+          Isso apagará grupos existentes e recriará tudo.
+        </p>
       </div>
     </div>
 
     <!-- Gerar Chave Eliminatória -->
     {% if championship.groups.exists %}
-    <div class="card">
-      <div class="card-header"><strong>Fase Eliminatória</strong></div>
-      <div class="card-body">
-        <p class="small text-muted">Gera a chave com os classificados de cada grupo.</p>
+    <div class="tt-card">
+      <div class="tt-card-header">
+        <span><i class="bi bi-diagram-3-fill me-2" style="color:var(--tt-danger)"></i>Fase Eliminatória</span>
+      </div>
+      <div class="tt-card-body">
+        <p class="small mb-3" style="color:var(--tt-text-muted)">Gera a chave com os classificados de cada grupo.</p>
         <form method="post" action="{% url 'championships:generate_elimination' championship.pk %}">
           {% csrf_token %}
-          <button type="submit" class="btn btn-danger btn-sm">Gerar Chave Eliminatória</button>
+          <button type="submit" class="tt-btn danger">
+            <i class="bi bi-diagram-3-fill"></i> Gerar Chave Eliminatória
+          </button>
         </form>
       </div>
     </div>
     {% endif %}
+
+    {% else %}
+    <div class="tt-alert info">
+      <i class="bi bi-info-circle-fill"></i>
+      <span>Este campeonato está <strong>finalizado</strong>. Nenhuma alteração pode ser feita.</span>
+    </div>
     {% endif %}
   </div>
 </div>
+{% endblock %}
 
+{% block extra_js %}
 <script>
 document.getElementById('btn-select-all')?.addEventListener('click', function () {
   document.querySelectorAll('.enroll-check').forEach(c => c.checked = true);

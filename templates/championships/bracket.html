@@ -1,110 +1,131 @@
 {% extends 'base.html' %}
 {% block title %}Chave — {{ championship.name }}{% endblock %}
+{% block nav_championships %}active{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h2><i class="bi bi-diagram-3"></i> Chave Eliminatória — {{ championship.name }}</h2>
-  <a href="{% url 'championships:detail' championship.pk %}" class="btn btn-outline-secondary btn-sm">
-    <i class="bi bi-arrow-left"></i> Voltar
-  </a>
+<a href="{% url 'championships:detail' championship.pk %}" class="tt-back-link">
+  <i class="bi bi-arrow-left"></i> Voltar ao Campeonato
+</a>
+
+<div class="tt-page-header">
+  <h2>
+    <span class="page-icon"><i class="bi bi-diagram-3-fill"></i></span>
+    Chave Eliminatória — <span style="color:var(--tt-text-muted);font-weight:500">{{ championship.name }}</span>
+  </h2>
 </div>
 
 {% if bracket %}
-<div class="d-flex gap-4 overflow-auto pb-3">
-  {% for phase_name, phase_matches in bracket.items %}
-  <div class="bracket-round">
-    <h6 class="text-center text-muted mb-3 text-uppercase fw-bold small">{{ phase_name }}</h6>
-    {% for match in phase_matches %}
-    <div class="bracket-match">
-      <div class="d-flex justify-content-between align-items-center mb-1
-        {% if match.winner == match.player_a %}winner{% endif %}">
-        <span>
-          {% if match.player_a %}{{ match.player_a.name }}{% else %}<em class="text-muted">A definir</em>{% endif %}
-        </span>
-        <span class="badge bg-dark ms-2">{{ match.score_a }}</span>
-      </div>
-      <hr class="my-1">
-      <div class="d-flex justify-content-between align-items-center
-        {% if match.winner == match.player_b %}winner{% endif %}">
-        <span>
-          {% if match.player_b %}{{ match.player_b.name }}{% else %}<em class="text-muted">A definir</em>{% endif %}
-        </span>
-        <span class="badge bg-dark ms-2">{{ match.score_b }}</span>
-      </div>
-      <div class="mt-2 text-end">
-        {% if match.status == 'finalizada' %}
-          <span class="badge bg-success small">Finalizada</span>
-        {% else %}
-          <a href="{% url 'matches:update' match.pk %}" class="btn btn-xs btn-outline-primary btn-sm py-0">
-            <i class="bi bi-pencil-square"></i> Resultado
-          </a>
-        {% endif %}
-      </div>
-    </div>
-    {% endfor %}
+<!-- Visual Bracket -->
+<div class="tt-card mb-4">
+  <div class="tt-card-header">
+    <span><i class="bi bi-diagram-3-fill me-2" style="color:var(--tt-danger)"></i>Chave</span>
   </div>
-  {% endfor %}
+  <div class="tt-card-body">
+    <div class="bracket-container">
+      {% for phase_name, phase_matches in bracket.items %}
+      <div class="bracket-round">
+        <div class="bracket-round-title">{{ phase_name }}</div>
+        {% for match in phase_matches %}
+        <div class="bracket-match">
+          <!-- Player A -->
+          <div class="bracket-player {% if match.winner == match.player_a %}winner{% endif %}">
+            <span class="bracket-player-name">
+              {% if match.player_a %}{{ match.player_a.name }}{% else %}<em style="color:#94a3b8">A definir</em>{% endif %}
+            </span>
+            <span class="bracket-player-score {% if match.status != 'finalizada' %}{% endif %}"
+                  style="{% if match.status != 'finalizada' %}background:#e2e8f0;color:#94a3b8{% endif %}">
+              {{ match.score_a }}
+            </span>
+          </div>
+          <!-- Player B -->
+          <div class="bracket-player {% if match.winner == match.player_b %}winner{% endif %}">
+            <span class="bracket-player-name">
+              {% if match.player_b %}{{ match.player_b.name }}{% else %}<em style="color:#94a3b8">A definir</em>{% endif %}
+            </span>
+            <span class="bracket-player-score"
+                  style="{% if match.status != 'finalizada' %}background:#e2e8f0;color:#94a3b8{% endif %}">
+              {{ match.score_b }}
+            </span>
+          </div>
+          <!-- Footer -->
+          <div class="bracket-match-footer">
+            {% if match.status == 'finalizada' %}
+              <span class="tt-badge concluida" style="font-size:.7rem"><i class="bi bi-check-circle-fill"></i> Finalizada</span>
+            {% else %}
+              <a href="{% url 'matches:update' match.pk %}" class="tt-btn accent sm" style="font-size:.75rem;padding:.25rem .6rem">
+                <i class="bi bi-pencil-fill"></i> Resultado
+              </a>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
 </div>
+
 {% else %}
-<div class="alert alert-warning">
-  Nenhuma partida eliminatória gerada.
-  <form method="post" action="{% url 'championships:generate_elimination' championship.pk %}" class="d-inline ms-2">
+<div class="tt-alert warning">
+  <i class="bi bi-exclamation-triangle-fill"></i>
+  <span>Nenhuma partida eliminatória gerada ainda.</span>
+  <form method="post" action="{% url 'championships:generate_elimination' championship.pk %}" class="ms-auto">
     {% csrf_token %}
-    <button class="btn btn-warning btn-sm">Gerar Agora</button>
+    <button class="tt-btn accent sm"><i class="bi bi-lightning-charge-fill"></i> Gerar Agora</button>
   </form>
 </div>
 {% endif %}
 
-<!-- Reorganizar posições da chave -->
+<!-- Reorganizar posições -->
 {% if not championship.is_finished %}
 {% if first_round_slots or first_round_slots_locked %}
-<div class="card mt-4">
-  <div class="card-header d-flex align-items-center gap-2">
-    <i class="bi bi-arrow-left-right"></i>
-    <strong>Reorganizar Posições</strong>
-    <small class="text-muted ms-1">— troca dois jogadores de posição na primeira rodada</small>
+<div class="tt-card mb-4">
+  <div class="tt-card-header">
+    <span><i class="bi bi-arrow-left-right me-2" style="color:var(--tt-primary)"></i>Reorganizar Posições</span>
+    <span class="text-muted small">troca dois jogadores na primeira rodada</span>
   </div>
-  <div class="card-body">
+  <div class="tt-card-body">
     {% if first_round_slots|length >= 2 %}
-    <form method="post" action="{% url 'championships:swap_bracket_players' championship.pk %}" class="row g-2 align-items-end mb-3">
+    <form method="post" action="{% url 'championships:swap_bracket_players' championship.pk %}" class="d-flex flex-wrap gap-3 align-items-end">
       {% csrf_token %}
-      <div class="col-auto">
-        <label class="form-label small text-muted mb-1">Jogador 1</label>
-        <select name="player1_id" class="form-select form-select-sm" required>
+      <div>
+        <label class="tt-form-label">Jogador 1</label>
+        <select name="player1_id" class="form-select form-select-sm" required style="min-width:160px">
           <option value="">Selecione...</option>
           {% for slot in first_round_slots %}
           <option value="{{ slot.player.pk }}">{{ slot.label }}</option>
           {% endfor %}
         </select>
       </div>
-      <div class="col-auto d-flex align-items-end pb-1">
-        <i class="bi bi-arrow-left-right text-muted"></i>
+      <div class="d-flex align-items-end pb-1">
+        <i class="bi bi-arrow-left-right" style="color:var(--tt-text-muted)"></i>
       </div>
-      <div class="col-auto">
-        <label class="form-label small text-muted mb-1">Jogador 2</label>
-        <select name="player2_id" class="form-select form-select-sm" required>
+      <div>
+        <label class="tt-form-label">Jogador 2</label>
+        <select name="player2_id" class="form-select form-select-sm" required style="min-width:160px">
           <option value="">Selecione...</option>
           {% for slot in first_round_slots %}
           <option value="{{ slot.player.pk }}">{{ slot.label }}</option>
           {% endfor %}
         </select>
       </div>
-      <div class="col-auto">
-        <button type="submit" class="btn btn-warning btn-sm">
-          <i class="bi bi-arrow-left-right"></i> Trocar
+      <div>
+        <button type="submit" class="tt-btn accent">
+          <i class="bi bi-arrow-left-right"></i> Trocar Posições
         </button>
       </div>
     </form>
     {% elif first_round_slots|length == 1 %}
-    <p class="text-muted small mb-2">Apenas 1 jogador disponível para troca.</p>
+    <p class="text-muted small mb-0">Apenas 1 jogador disponível para troca.</p>
     {% else %}
-    <p class="text-muted small mb-2">Nenhum jogador disponível para troca.</p>
+    <p class="text-muted small mb-0">Nenhum jogador disponível para troca.</p>
     {% endif %}
+
     {% if first_round_slots_locked %}
-    <div class="d-flex flex-wrap gap-2 align-items-center">
-      <small class="text-muted"><i class="bi bi-lock-fill"></i> Bloqueados (já jogaram):</small>
+    <div class="d-flex flex-wrap gap-2 align-items-center mt-3 pt-3 border-top">
+      <small style="color:var(--tt-text-muted)"><i class="bi bi-lock-fill me-1"></i>Bloqueados (já jogaram):</small>
       {% for slot in first_round_slots_locked %}
-      <span class="badge bg-secondary">{{ slot.player.name }}</span>
+      <span class="tt-badge finalizado">{{ slot.player.name }}</span>
       {% endfor %}
     </div>
     {% endif %}
@@ -114,46 +135,66 @@
 {% endif %}
 
 <!-- Lista completa das partidas -->
-<div class="card mt-4">
-  <div class="card-header"><strong>Todas as Partidas Eliminatórias</strong></div>
-  <div class="card-body p-0">
-    <table class="table table-sm mb-0">
-      <thead class="table-dark">
-        <tr><th>Fase</th><th>Jogador A</th><th>Placar</th><th>Jogador B</th><th>Vencedor</th><th></th></tr>
-      </thead>
-      <tbody>
-        {% for match in matches %}
-        <tr>
-          <td><span class="badge bg-secondary">{{ match.get_phase_display }}</span></td>
-          <td {% if match.winner == match.player_a %}class="fw-bold text-success"{% endif %}>
-            {{ match.player_a|default:"A definir" }}
-          </td>
-          <td class="text-center">
-            {% if match.status == 'finalizada' %}
-              <span class="badge bg-dark">{{ match.score_a }} × {{ match.score_b }}</span>
-            {% else %}
-              <span class="text-muted">-</span>
-            {% endif %}
-          </td>
-          <td {% if match.winner == match.player_b %}class="fw-bold text-success"{% endif %}>
-            {{ match.player_b|default:"A definir" }}
-          </td>
-          <td>
-            {% if match.winner %}<span class="badge bg-success">{{ match.winner.name }}</span>{% endif %}
-          </td>
-          <td>
-            {% if match.status != 'finalizada' and match.player_a and match.player_b %}
-            <a href="{% url 'matches:update' match.pk %}" class="btn btn-sm btn-outline-primary">
-              <i class="bi bi-pencil-square"></i>
-            </a>
-            {% endif %}
-          </td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="6" class="text-center text-muted py-3">Nenhuma partida.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
+<div class="tt-card">
+  <div class="tt-card-header">
+    <span><i class="bi bi-list-ul me-2"></i>Todas as Partidas Eliminatórias</span>
+    <span class="tt-badge finalizado">{{ matches|length }}</span>
+  </div>
+  <div class="tt-card-body p-0">
+    <div style="overflow-x:auto">
+      <table class="tt-table">
+        <thead>
+          <tr>
+            <th>Fase</th>
+            <th>Jogador A</th>
+            <th class="text-center" style="width:80px">Placar</th>
+            <th>Jogador B</th>
+            <th>Vencedor</th>
+            <th style="width:44px"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for match in matches %}
+          <tr>
+            <td><span class="tt-badge finalizado" style="font-size:.75rem">{{ match.get_phase_display }}</span></td>
+            <td class="{% if match.winner == match.player_a %}fw-bold text-success{% endif %}">
+              {{ match.player_a|default:"A definir" }}
+            </td>
+            <td class="text-center">
+              {% if match.status == 'finalizada' %}
+                <span class="tt-badge finalizado fw-bold" style="background:#1e293b;color:#f8fafc">{{ match.score_a }}&nbsp;×&nbsp;{{ match.score_b }}</span>
+              {% else %}
+                <span style="color:#94a3b8">—</span>
+              {% endif %}
+            </td>
+            <td class="{% if match.winner == match.player_b %}fw-bold text-success{% endif %}">
+              {{ match.player_b|default:"A definir" }}
+            </td>
+            <td>
+              {% if match.winner %}
+                <span class="tt-badge concluida"><i class="bi bi-trophy-fill"></i> {{ match.winner.name }}</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if match.status != 'finalizada' and match.player_a and match.player_b %}
+              <a href="{% url 'matches:update' match.pk %}" class="tt-btn ghost sm icon-only" title="Registrar resultado">
+                <i class="bi bi-pencil-fill"></i>
+              </a>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6">
+              <div class="empty-state" style="padding:1.5rem">
+                <p>Nenhuma partida.</p>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 {% endblock %}

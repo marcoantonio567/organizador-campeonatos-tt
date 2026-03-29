@@ -1,91 +1,112 @@
 {% extends 'base.html' %}
 {% block title %}{{ title }}{% endblock %}
+{% block nav_players %}active{% endblock %}
 
 {% block content %}
+<a href="{% url 'players:list' %}" class="tt-back-link">
+  <i class="bi bi-arrow-left"></i> Voltar aos Jogadores
+</a>
+
 <div class="row justify-content-center">
-  <div class="col-md-6">
-    <div class="card">
-      <div class="card-header"><h5 class="mb-0">{{ title }}</h5></div>
-      <div class="card-body">
+  <div class="col-md-7 col-lg-6">
+    <div class="tt-card">
+      <div class="tt-card-header">
+        <span><i class="bi bi-person-fill me-2" style="color:var(--tt-primary)"></i>{{ title }}</span>
+      </div>
+      <div class="tt-card-body">
         <form method="post">
           {% csrf_token %}
 
           {% for field in form %}
-            <div class="mb-3">
-              <label class="form-label fw-semibold">{{ field.label }}</label>
-              {{ field }}
-              {% if field.errors %}
-                <div class="text-danger small">{{ field.errors }}</div>
-              {% endif %}
-            </div>
+          <div class="mb-3">
+            <label class="tt-form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+              <div class="mt-1" style="color:var(--tt-danger);font-size:.82rem">{{ field.errors }}</div>
+            {% endif %}
+          </div>
           {% endfor %}
 
           {% if ranking_form %}
-          <hr>
-          <h6 class="mb-1">Categorias</h6>
-          <p class="text-muted small mb-3">Marque as categorias em que o jogador compete e informe os pontos de cada uma.</p>
+          <div class="border-top pt-3 mt-3">
+            <h6 class="fw-bold mb-1">Categorias</h6>
+            <p class="small mb-3" style="color:var(--tt-text-muted)">Marque as categorias em que o jogador compete e informe os pontos de cada uma.</p>
 
-          <!-- Iniciante -->
-          <div class="border rounded p-3 mb-2">
-            <div class="form-check">
-              <input class="form-check-input category-toggle" type="checkbox"
-                     id="chk_iniciante" data-target="pts_iniciante"
-                     {% if ranking_checked.iniciante %}checked{% endif %}>
-              <label class="form-check-label fw-semibold" for="chk_iniciante">
-                <span class="badge text-bg-success fs-6 px-2">Iniciante</span>
-              </label>
+            <!-- Iniciante -->
+            <div class="tt-card mb-2" style="border-left:3px solid var(--tt-success)">
+              <div class="tt-card-body" style="padding:.85rem 1rem">
+                <div class="form-check mb-0">
+                  <input class="form-check-input category-toggle" type="checkbox"
+                         id="chk_iniciante" data-target="pts_iniciante"
+                         {% if ranking_checked.iniciante %}checked{% endif %}
+                         style="accent-color:var(--tt-success)">
+                  <label class="form-check-label fw-semibold" for="chk_iniciante">
+                    <span class="tt-badge iniciante ms-1"><i class="bi bi-star me-1"></i>Iniciante</span>
+                  </label>
+                </div>
+                <div id="pts_iniciante" class="mt-2{% if not ranking_checked.iniciante %} d-none{% endif %}">
+                  <label class="tt-form-label">Pontos nesta categoria</label>
+                  {{ ranking_form.pontos_iniciante }}
+                  {% if ranking_form.pontos_iniciante.errors %}
+                    <div style="color:var(--tt-danger);font-size:.82rem">{{ ranking_form.pontos_iniciante.errors }}</div>
+                  {% endif %}
+                </div>
+              </div>
             </div>
-            <div id="pts_iniciante" class="mt-2 ps-1{% if not ranking_checked.iniciante %} d-none{% endif %}">
-              <label class="form-label small text-muted mb-1">Pontos nesta categoria</label>
-              {{ ranking_form.pontos_iniciante }}
-              {% if ranking_form.pontos_iniciante.errors %}
-                <div class="text-danger small">{{ ranking_form.pontos_iniciante.errors }}</div>
-              {% endif %}
-            </div>
-          </div>
 
-          <!-- Intermediário -->
-          <div class="border rounded p-3 mb-2">
-            <div class="form-check">
-              <input class="form-check-input category-toggle" type="checkbox"
-                     id="chk_intermediario" data-target="pts_intermediario"
-                     {% if ranking_checked.intermediario %}checked{% endif %}>
-              <label class="form-check-label fw-semibold" for="chk_intermediario">
-                <span class="badge text-bg-warning fs-6 px-2">Intermediário</span>
-              </label>
+            <!-- Intermediário -->
+            <div class="tt-card mb-2" style="border-left:3px solid var(--tt-accent)">
+              <div class="tt-card-body" style="padding:.85rem 1rem">
+                <div class="form-check mb-0">
+                  <input class="form-check-input category-toggle" type="checkbox"
+                         id="chk_intermediario" data-target="pts_intermediario"
+                         {% if ranking_checked.intermediario %}checked{% endif %}
+                         style="accent-color:var(--tt-accent)">
+                  <label class="form-check-label fw-semibold" for="chk_intermediario">
+                    <span class="tt-badge intermediario ms-1"><i class="bi bi-star-half me-1"></i>Intermediário</span>
+                  </label>
+                </div>
+                <div id="pts_intermediario" class="mt-2{% if not ranking_checked.intermediario %} d-none{% endif %}">
+                  <label class="tt-form-label">Pontos nesta categoria</label>
+                  {{ ranking_form.pontos_intermediario }}
+                  {% if ranking_form.pontos_intermediario.errors %}
+                    <div style="color:var(--tt-danger);font-size:.82rem">{{ ranking_form.pontos_intermediario.errors }}</div>
+                  {% endif %}
+                </div>
+              </div>
             </div>
-            <div id="pts_intermediario" class="mt-2 ps-1{% if not ranking_checked.intermediario %} d-none{% endif %}">
-              <label class="form-label small text-muted mb-1">Pontos nesta categoria</label>
-              {{ ranking_form.pontos_intermediario }}
-              {% if ranking_form.pontos_intermediario.errors %}
-                <div class="text-danger small">{{ ranking_form.pontos_intermediario.errors }}</div>
-              {% endif %}
-            </div>
-          </div>
 
-          <!-- Avançado -->
-          <div class="border rounded p-3 mb-3">
-            <div class="form-check">
-              <input class="form-check-input category-toggle" type="checkbox"
-                     id="chk_avancado" data-target="pts_avancado"
-                     {% if ranking_checked.avancado %}checked{% endif %}>
-              <label class="form-check-label fw-semibold" for="chk_avancado">
-                <span class="badge text-bg-danger fs-6 px-2">Avançado</span>
-              </label>
-            </div>
-            <div id="pts_avancado" class="mt-2 ps-1{% if not ranking_checked.avancado %} d-none{% endif %}">
-              <label class="form-label small text-muted mb-1">Pontos nesta categoria</label>
-              {{ ranking_form.pontos_avancado }}
-              {% if ranking_form.pontos_avancado.errors %}
-                <div class="text-danger small">{{ ranking_form.pontos_avancado.errors }}</div>
-              {% endif %}
+            <!-- Avançado -->
+            <div class="tt-card mb-3" style="border-left:3px solid var(--tt-danger)">
+              <div class="tt-card-body" style="padding:.85rem 1rem">
+                <div class="form-check mb-0">
+                  <input class="form-check-input category-toggle" type="checkbox"
+                         id="chk_avancado" data-target="pts_avancado"
+                         {% if ranking_checked.avancado %}checked{% endif %}
+                         style="accent-color:var(--tt-danger)">
+                  <label class="form-check-label fw-semibold" for="chk_avancado">
+                    <span class="tt-badge avancado ms-1"><i class="bi bi-star-fill me-1"></i>Avançado</span>
+                  </label>
+                </div>
+                <div id="pts_avancado" class="mt-2{% if not ranking_checked.avancado %} d-none{% endif %}">
+                  <label class="tt-form-label">Pontos nesta categoria</label>
+                  {{ ranking_form.pontos_avancado }}
+                  {% if ranking_form.pontos_avancado.errors %}
+                    <div style="color:var(--tt-danger);font-size:.82rem">{{ ranking_form.pontos_avancado.errors }}</div>
+                  {% endif %}
+                </div>
+              </div>
             </div>
           </div>
           {% endif %}
 
-          <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-primary">Salvar</button>
-            <a href="{% url 'players:list' %}" class="btn btn-outline-secondary">Cancelar</a>
+          <div class="d-flex gap-2 mt-2">
+            <button type="submit" class="tt-btn primary">
+              <i class="bi bi-check-lg"></i> Salvar
+            </button>
+            <a href="{% url 'players:list' %}" class="tt-btn ghost">
+              <i class="bi bi-x-lg"></i> Cancelar
+            </a>
           </div>
         </form>
       </div>
@@ -110,11 +131,7 @@ document.querySelectorAll('.category-toggle').forEach(function (chk) {
     }
   }
 
-  // Estado inicial
-  if (!chk.checked) {
-    input.disabled = true;
-  }
-
+  if (!chk.checked) { input.disabled = true; }
   chk.addEventListener('change', apply);
 });
 </script>

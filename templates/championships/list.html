@@ -1,54 +1,79 @@
 {% extends 'base.html' %}
 {% block title %}Campeonatos{% endblock %}
+{% block nav_championships %}active{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h2><i class="bi bi-trophy"></i> Campeonatos</h2>
-  <a href="{% url 'championships:create' %}" class="btn btn-primary">
+<div class="tt-page-header">
+  <h2>
+    <span class="page-icon"><i class="bi bi-trophy-fill"></i></span>
+    Campeonatos
+  </h2>
+  <a href="{% url 'championships:create' %}" class="tt-btn primary">
     <i class="bi bi-plus-lg"></i> Novo Campeonato
   </a>
 </div>
 
-<ul class="nav nav-tabs mb-0" role="tablist">
-  <li class="nav-item">
-    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-ativos" type="button">
-      Ativos
-      <span class="badge bg-secondary ms-1">{{ ativos.count }}</span>
-    </button>
-  </li>
-  <li class="nav-item">
-    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-historico" type="button">
-      <i class="bi bi-clock-history"></i> Histórico
-      <span class="badge bg-secondary ms-1">{{ historico.count }}</span>
-    </button>
-  </li>
-</ul>
+<div class="tt-tabs" id="champTabs" role="tablist">
+  <button class="tt-tab-btn active" data-target="tab-ativos" type="button" role="tab">
+    <i class="bi bi-lightning-charge-fill" style="color:var(--tt-accent)"></i>
+    Ativos
+    <span class="tt-badge ativo ms-1">{{ ativos.count }}</span>
+  </button>
+  <button class="tt-tab-btn" data-target="tab-historico" type="button" role="tab">
+    <i class="bi bi-clock-history"></i>
+    Histórico
+    <span class="tt-badge finalizado ms-1">{{ historico.count }}</span>
+  </button>
+</div>
 
-<div class="tab-content">
+<div class="tt-tab-content">
   <!-- Ativos -->
-  <div class="tab-pane fade show active" id="tab-ativos">
-    <div class="row g-3 pt-3">
+  <div class="tt-tab-pane show" id="tab-ativos">
+    <div class="row g-3">
       {% for ch in ativos %}
         {% include 'championships/_card.html' %}
       {% empty %}
-      <div class="col">
-        <div class="alert alert-info mb-0">Nenhum campeonato ativo no momento.</div>
+      <div class="col-12">
+        <div class="empty-state">
+          <div class="empty-icon"><i class="bi bi-trophy"></i></div>
+          <p>Nenhum campeonato ativo no momento.</p>
+          <a href="{% url 'championships:create' %}" class="tt-btn primary mt-2">
+            <i class="bi bi-plus-lg"></i> Criar primeiro campeonato
+          </a>
+        </div>
       </div>
       {% endfor %}
     </div>
   </div>
 
   <!-- Histórico -->
-  <div class="tab-pane fade" id="tab-historico">
-    <div class="row g-3 pt-3">
+  <div class="tt-tab-pane" id="tab-historico">
+    <div class="row g-3">
       {% for ch in historico %}
         {% include 'championships/_card.html' with historico=True %}
       {% empty %}
-      <div class="col">
-        <div class="alert alert-secondary mb-0">Nenhum campeonato no histórico ainda.</div>
+      <div class="col-12">
+        <div class="empty-state">
+          <div class="empty-icon"><i class="bi bi-clock-history"></i></div>
+          <p>Nenhum campeonato no histórico ainda.</p>
+        </div>
       </div>
       {% endfor %}
     </div>
   </div>
 </div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.querySelectorAll('.tt-tab-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.tt-tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tt-tab-pane').forEach(p => p.classList.remove('show'));
+    this.classList.add('active');
+    document.getElementById(this.dataset.target).classList.add('show');
+  });
+});
+</script>
 {% endblock %}

@@ -1,33 +1,59 @@
-<div class="card border-top-0 rounded-top-0">
-  <div class="card-body p-0">
-    <table class="table table-hover mb-0">
-      <thead class="table-dark">
+<div class="tt-card" style="border-top-left-radius:0;border-top-right-radius:0;border-top:none">
+  <div class="tt-card-body p-0">
+    <table class="tt-table">
+      <thead>
         <tr>
-          <th>#</th>
-          <th>Nome</th>
-          <th>Pontos</th>
-          <th></th>
+          <th style="width:48px">#</th>
+          <th>Jogador</th>
+          <th style="width:100px">Pontos</th>
+          <th style="width:90px" class="text-end">Ações</th>
         </tr>
       </thead>
       <tbody>
         {% for ranking in ranking_list %}
-        <tr>
-          <td class="text-muted">{{ forloop.counter }}</td>
-          <td><a href="{% url 'players:detail' ranking.player.pk %}">{{ ranking.player.name }}</a></td>
-          <td><strong>{{ ranking.pontos }}</strong> pts</td>
+        <tr class="{% if forloop.counter == 1 %}qualified-1{% elif forloop.counter == 2 %}qualified-2{% elif forloop.counter == 3 %}qualified-3{% endif %}">
+          <td>
+            {% if forloop.counter == 1 %}
+              <span class="pos-medal gold">1</span>
+            {% elif forloop.counter == 2 %}
+              <span class="pos-medal silver">2</span>
+            {% elif forloop.counter == 3 %}
+              <span class="pos-medal bronze">3</span>
+            {% else %}
+              <span class="pos-medal other">{{ forloop.counter }}</span>
+            {% endif %}
+          </td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <span class="player-avatar">{{ ranking.player.name|slice:":2"|upper }}</span>
+              <a href="{% url 'players:detail' ranking.player.pk %}" class="player-link">
+                {{ ranking.player.name }}
+              </a>
+            </div>
+          </td>
+          <td>
+            <span class="fw-bold" style="color:var(--tt-primary)">{{ ranking.pontos }}</span>
+            <span class="text-muted small"> pts</span>
+          </td>
           <td class="text-end">
-            <a href="{% url 'players:update' ranking.player.pk %}" class="btn btn-sm btn-outline-secondary">
-              <i class="bi bi-pencil"></i>
+            <a href="{% url 'players:update' ranking.player.pk %}" class="tt-btn ghost sm icon-only" title="Editar">
+              <i class="bi bi-pencil-fill"></i>
             </a>
-            <a href="{% url 'players:delete' ranking.player.pk %}" class="btn btn-sm btn-outline-danger">
-              <i class="bi bi-trash"></i>
+            <a href="{% url 'players:delete' ranking.player.pk %}" class="tt-btn sm icon-only" style="background:transparent;color:#fca5a5;border:1.5px solid #fecaca" title="Excluir">
+              <i class="bi bi-trash-fill"></i>
             </a>
           </td>
         </tr>
         {% empty %}
         <tr>
-          <td colspan="4" class="text-center text-muted py-4">
-            Nenhum jogador {{ empty_label|lower }} cadastrado.
+          <td colspan="4">
+            <div class="empty-state" style="padding:2rem">
+              <div class="empty-icon"><i class="bi bi-person-x"></i></div>
+              <p>Nenhum jogador {{ empty_label|lower }} cadastrado.</p>
+              <a href="{% url 'players:create' %}" class="tt-btn primary sm mt-1">
+                <i class="bi bi-plus-lg"></i> Cadastrar Jogador
+              </a>
+            </div>
           </td>
         </tr>
         {% endfor %}

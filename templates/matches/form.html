@@ -1,51 +1,75 @@
 {% extends 'base.html' %}
 {% block title %}Registrar Resultado{% endblock %}
+{% block nav_championships %}active{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-  <div class="col-md-5">
-    <div class="card">
-      <div class="card-header">
-        <h5 class="mb-0">
-          <i class="bi bi-pencil-square"></i>
-          Resultado da Partida
-        </h5>
+<a href="javascript:history.back()" class="tt-back-link">
+  <i class="bi bi-arrow-left"></i> Voltar
+</a>
+
+<div class="match-form-card">
+  <div class="tt-card">
+    <div class="tt-card-header">
+      <span><i class="bi bi-pencil-fill me-2" style="color:var(--tt-accent)"></i>Resultado da Partida</span>
+      <span class="tt-badge finalizado">{{ match.get_phase_display }}</span>
+    </div>
+
+    <div class="tt-card-body">
+      <!-- Players VS display -->
+      <div class="match-vs-display">
+        <div class="match-player-box">
+          <div class="match-player-initial">{{ match.player_a.name|slice:":1"|upper }}</div>
+          <div class="match-player-name">{{ match.player_a }}</div>
+        </div>
+        <div class="match-vs-badge">VS</div>
+        <div class="match-player-box">
+          <div class="match-player-initial" style="background:var(--tt-danger)">{{ match.player_b.name|slice:":1"|upper }}</div>
+          <div class="match-player-name">{{ match.player_b }}</div>
+        </div>
       </div>
-      <div class="card-body">
-        <div class="text-center mb-4">
-          <span class="badge bg-secondary mb-2">{{ match.get_phase_display }}</span>
-          <div class="d-flex justify-content-center align-items-center gap-3 mt-2">
-            <div class="text-center">
-              <div class="fw-bold fs-5">{{ match.player_a }}</div>
-              <small class="text-muted">Jogador A</small>
-            </div>
-            <span class="text-muted">vs</span>
-            <div class="text-center">
-              <div class="fw-bold fs-5">{{ match.player_b }}</div>
-              <small class="text-muted">Jogador B</small>
-            </div>
+
+      <!-- Score Form -->
+      <form method="post">
+        {% csrf_token %}
+        <div class="d-flex justify-content-center align-items-center gap-4 mb-4">
+          <!-- Score A -->
+          <div class="score-input-group">
+            <span class="score-input-label">{{ match.player_a.name|truncatechars:12 }}</span>
+            {{ form.score_a }}
+          </div>
+
+          <div style="font-size:1.5rem;color:#cbd5e1;font-weight:300;margin-top:1rem">×</div>
+
+          <!-- Score B -->
+          <div class="score-input-group">
+            <span class="score-input-label">{{ match.player_b.name|truncatechars:12 }}</span>
+            {{ form.score_b }}
           </div>
         </div>
 
-        <form method="post">
-          {% csrf_token %}
-          <div class="row g-3 mb-3">
-            <div class="col-6">
-              <label class="form-label">Sets — {{ match.player_a }}</label>
-              {{ form.score_a }}
-            </div>
-            <div class="col-6">
-              <label class="form-label">Sets — {{ match.player_b }}</label>
-              {{ form.score_b }}
-            </div>
-          </div>
-          <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-primary">Salvar Resultado</button>
-            <a href="javascript:history.back()" class="btn btn-outline-secondary">Cancelar</a>
-          </div>
-        </form>
-      </div>
+        <div class="d-flex gap-2 justify-content-center">
+          <button type="submit" class="tt-btn primary" style="padding:.55rem 1.5rem">
+            <i class="bi bi-check-lg"></i> Salvar Resultado
+          </button>
+          <a href="javascript:history.back()" class="tt-btn ghost">
+            <i class="bi bi-x-lg"></i> Cancelar
+          </a>
+        </div>
+      </form>
     </div>
   </div>
 </div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+/* Style the score inputs from Django form */
+document.querySelectorAll('#id_score_a, #id_score_b').forEach(function(input) {
+  input.classList.add('score-input');
+  input.setAttribute('min', '0');
+  input.setAttribute('max', '99');
+  input.setAttribute('placeholder', '0');
+});
+</script>
 {% endblock %}
