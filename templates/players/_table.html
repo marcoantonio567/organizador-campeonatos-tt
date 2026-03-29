@@ -5,30 +5,28 @@
         <tr>
           <th>#</th>
           <th>Nome</th>
-          <th>Categoria</th>
-          <th>Ranking</th>
+          <th>Pontos</th>
           <th></th>
         </tr>
       </thead>
       <tbody>
-        {% for player in player_list %}
+        {% for ranking in ranking_list %}
         <tr>
           <td class="text-muted">{{ forloop.counter }}</td>
-          <td><a href="{% url 'players:detail' player.pk %}">{{ player.name }}</a></td>
-          <td><span class="badge bg-secondary">{{ player.get_categoria_display }}</span></td>
-          <td><strong>{{ player.ranking_atual }}</strong> pts</td>
+          <td><a href="{% url 'players:detail' ranking.player.pk %}">{{ ranking.player.name }}</a></td>
+          <td><strong>{{ ranking.pontos }}</strong> pts</td>
           <td class="text-end">
-            <a href="{% url 'players:update' player.pk %}" class="btn btn-sm btn-outline-secondary">
+            <a href="{% url 'players:update' ranking.player.pk %}" class="btn btn-sm btn-outline-secondary">
               <i class="bi bi-pencil"></i>
             </a>
-            <a href="{% url 'players:delete' player.pk %}" class="btn btn-sm btn-outline-danger">
+            <a href="{% url 'players:delete' ranking.player.pk %}" class="btn btn-sm btn-outline-danger">
               <i class="bi bi-trash"></i>
             </a>
           </td>
         </tr>
         {% empty %}
         <tr>
-          <td colspan="5" class="text-center text-muted py-4">
+          <td colspan="4" class="text-center text-muted py-4">
             Nenhum jogador {{ empty_label|lower }} cadastrado.
           </td>
         </tr>

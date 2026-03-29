@@ -66,14 +66,20 @@
       <div class="card-body p-0">
         <table class="table table-sm mb-0">
           <thead>
-            <tr><th>#</th><th>Jogador</th><th>Ranking</th><th></th></tr>
+            <tr><th>#</th><th>Jogador</th><th>Categorias</th><th></th></tr>
           </thead>
           <tbody>
             {% for enrollment in enrollments %}
             <tr>
               <td class="text-muted">{{ forloop.counter }}</td>
               <td>{{ enrollment.player.name }}</td>
-              <td>{{ enrollment.player.ranking_atual }} pts</td>
+              <td>
+                {% for ranking in enrollment.player.category_rankings.all %}
+                  <span class="badge bg-secondary me-1">{{ ranking.get_categoria_display }}: {{ ranking.pontos }} pts</span>
+                {% empty %}
+                  <span class="text-muted">—</span>
+                {% endfor %}
+              </td>
               <td>
                 <form method="post" action="{% url 'championships:remove_enrollment' championship.pk enrollment.pk %}" class="d-inline">
                   {% csrf_token %}

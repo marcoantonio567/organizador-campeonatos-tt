@@ -27,7 +27,7 @@ class Championship(models.Model):
         return self.name
 
     def get_enrolled_players(self):
-        return Player.objects.filter(enrollments__championship=self).order_by('-ranking_atual')
+        return Player.objects.filter(enrollments__championship=self).order_by('name')
 
 
 class Enrollment(models.Model):

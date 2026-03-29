@@ -18,7 +18,26 @@
               {% endif %}
             </div>
           {% endfor %}
-          <div class="d-flex gap-2">
+
+          {% if ranking_form %}
+          <hr>
+          <h6 class="mb-1">Pontuação por Categoria</h6>
+          <p class="text-muted small mb-3">
+            Preencha os pontos para cada categoria em que o jogador participa.
+            Deixe em branco para não cadastrar nessa categoria.
+          </p>
+          {% for field in ranking_form %}
+            <div class="mb-3">
+              <label class="form-label">{{ field.label }}</label>
+              {{ field }}
+              {% if field.errors %}
+                <div class="text-danger small">{{ field.errors }}</div>
+              {% endif %}
+            </div>
+          {% endfor %}
+          {% endif %}
+
+          <div class="d-flex gap-2 mt-3">
             <button type="submit" class="btn btn-primary">Salvar</button>
             <a href="{% url 'players:list' %}" class="btn btn-outline-secondary">Cancelar</a>
           </div>

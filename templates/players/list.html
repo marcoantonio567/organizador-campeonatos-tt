@@ -24,7 +24,7 @@
 <div class="tab-content">
   {% for key, label, group in categories %}
   <div class="tab-pane fade {% if forloop.first %}show active{% endif %}" id="tab-{{ key }}">
-    {% include 'players/_table.html' with player_list=group empty_label=label %}
+    {% include 'players/_table.html' with ranking_list=group empty_label=label %}
   </div>
   {% endfor %}
 </div>

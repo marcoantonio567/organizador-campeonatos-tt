@@ -30,7 +30,7 @@ def generate_groups(championship: Championship, num_groups: int) -> list:
         Enrollment.objects
         .filter(championship=championship)
         .select_related('player')
-        .order_by('seed', '-player__ranking_atual')
+        .order_by('seed')
     )
     players = [e.player for e in enrollments]
 
