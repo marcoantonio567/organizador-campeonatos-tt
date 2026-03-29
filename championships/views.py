@@ -130,6 +130,9 @@ class RemoveEnrollmentView(View):
 class GenerateGroupsView(View):
     def post(self, request, pk):
         championship = get_object_or_404(Championship, pk=pk)
+        if request.POST.get('confirm_password') != '1234':
+            messages.error(request, 'Senha incorreta. Os grupos não foram gerados.')
+            return redirect('championships:detail', pk=pk)
         form = GenerateGroupsForm(request.POST)
         if form.is_valid():
             try:

@@ -215,14 +215,20 @@
         <span><i class="bi bi-grid-3x3-gap-fill me-2" style="color:var(--tt-accent)"></i>Gerar Fase de Grupos</span>
       </div>
       <div class="tt-card-body">
-        <form method="post" action="{% url 'championships:generate_groups' championship.pk %}" class="d-flex gap-2 align-items-end">
+        <form method="post" action="{% url 'championships:generate_groups' championship.pk %}">
           {% csrf_token %}
-          <div class="flex-grow-1">
-            <label class="tt-form-label">Nº de grupos</label>
-            {{ generate_groups_form.num_groups }}
+          <div class="d-flex gap-2 align-items-end mb-2">
+            <div class="flex-grow-1">
+              <label class="tt-form-label">Nº de grupos</label>
+              {{ generate_groups_form.num_groups }}
+            </div>
+            <div>
+              <label class="tt-form-label">Senha de confirmação</label>
+              <input type="password" name="confirm_password" class="tt-form-control" placeholder="••••" style="width:130px" required>
+            </div>
           </div>
-          <button type="submit" class="tt-btn accent">
-            <i class="bi bi-grid-3x3-gap"></i> Gerar
+          <button type="submit" class="tt-btn accent w-100" style="justify-content:center">
+            <i class="bi bi-grid-3x3-gap"></i> Gerar Grupos
           </button>
         </form>
         <p class="small mt-2 mb-0" style="color:var(--tt-text-muted)">
