@@ -9,9 +9,10 @@
       <div class="card-body">
         <form method="post">
           {% csrf_token %}
+
           {% for field in form %}
             <div class="mb-3">
-              <label class="form-label">{{ field.label }}</label>
+              <label class="form-label fw-semibold">{{ field.label }}</label>
               {{ field }}
               {% if field.errors %}
                 <div class="text-danger small">{{ field.errors }}</div>
@@ -21,23 +22,68 @@
 
           {% if ranking_form %}
           <hr>
-          <h6 class="mb-1">Pontuação por Categoria</h6>
-          <p class="text-muted small mb-3">
-            Preencha os pontos para cada categoria em que o jogador participa.
-            Deixe em branco para não cadastrar nessa categoria.
-          </p>
-          {% for field in ranking_form %}
-            <div class="mb-3">
-              <label class="form-label">{{ field.label }}</label>
-              {{ field }}
-              {% if field.errors %}
-                <div class="text-danger small">{{ field.errors }}</div>
+          <h6 class="mb-1">Categorias</h6>
+          <p class="text-muted small mb-3">Marque as categorias em que o jogador compete e informe os pontos de cada uma.</p>
+
+          <!-- Iniciante -->
+          <div class="border rounded p-3 mb-2">
+            <div class="form-check">
+              <input class="form-check-input category-toggle" type="checkbox"
+                     id="chk_iniciante" data-target="pts_iniciante"
+                     {% if ranking_checked.iniciante %}checked{% endif %}>
+              <label class="form-check-label fw-semibold" for="chk_iniciante">
+                <span class="badge text-bg-success fs-6 px-2">Iniciante</span>
+              </label>
+            </div>
+            <div id="pts_iniciante" class="mt-2 ps-1{% if not ranking_checked.iniciante %} d-none{% endif %}">
+              <label class="form-label small text-muted mb-1">Pontos nesta categoria</label>
+              {{ ranking_form.pontos_iniciante }}
+              {% if ranking_form.pontos_iniciante.errors %}
+                <div class="text-danger small">{{ ranking_form.pontos_iniciante.errors }}</div>
               {% endif %}
             </div>
-          {% endfor %}
+          </div>
+
+          <!-- Intermediário -->
+          <div class="border rounded p-3 mb-2">
+            <div class="form-check">
+              <input class="form-check-input category-toggle" type="checkbox"
+                     id="chk_intermediario" data-target="pts_intermediario"
+                     {% if ranking_checked.intermediario %}checked{% endif %}>
+              <label class="form-check-label fw-semibold" for="chk_intermediario">
+                <span class="badge text-bg-warning fs-6 px-2">Intermediário</span>
+              </label>
+            </div>
+            <div id="pts_intermediario" class="mt-2 ps-1{% if not ranking_checked.intermediario %} d-none{% endif %}">
+              <label class="form-label small text-muted mb-1">Pontos nesta categoria</label>
+              {{ ranking_form.pontos_intermediario }}
+              {% if ranking_form.pontos_intermediario.errors %}
+                <div class="text-danger small">{{ ranking_form.pontos_intermediario.errors }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Avançado -->
+          <div class="border rounded p-3 mb-3">
+            <div class="form-check">
+              <input class="form-check-input category-toggle" type="checkbox"
+                     id="chk_avancado" data-target="pts_avancado"
+                     {% if ranking_checked.avancado %}checked{% endif %}>
+              <label class="form-check-label fw-semibold" for="chk_avancado">
+                <span class="badge text-bg-danger fs-6 px-2">Avançado</span>
+              </label>
+            </div>
+            <div id="pts_avancado" class="mt-2 ps-1{% if not ranking_checked.avancado %} d-none{% endif %}">
+              <label class="form-label small text-muted mb-1">Pontos nesta categoria</label>
+              {{ ranking_form.pontos_avancado }}
+              {% if ranking_form.pontos_avancado.errors %}
+                <div class="text-danger small">{{ ranking_form.pontos_avancado.errors }}</div>
+              {% endif %}
+            </div>
+          </div>
           {% endif %}
 
-          <div class="d-flex gap-2 mt-3">
+          <div class="d-flex gap-2">
             <button type="submit" class="btn btn-primary">Salvar</button>
             <a href="{% url 'players:list' %}" class="btn btn-outline-secondary">Cancelar</a>
           </div>
@@ -46,4 +92,30 @@
     </div>
   </div>
 </div>
+
+<script>
+document.querySelectorAll('.category-toggle').forEach(function (chk) {
+  const panel = document.getElementById(chk.dataset.target);
+  const input = panel.querySelector('input[type="number"]');
+
+  function apply() {
+    if (chk.checked) {
+      panel.classList.remove('d-none');
+      input.disabled = false;
+      if (input.value === '') input.value = 1000;
+    } else {
+      panel.classList.add('d-none');
+      input.disabled = true;
+      input.value = '';
+    }
+  }
+
+  // Estado inicial
+  if (!chk.checked) {
+    input.disabled = true;
+  }
+
+  chk.addEventListener('change', apply);
+});
+</script>
 {% endblock %}

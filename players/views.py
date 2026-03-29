@@ -66,6 +66,19 @@ class PlayerDetailView(DetailView):
         return ctx
 
 
+def _build_ranking_checked(post_data=None, player=None):
+    """Retorna dict com quais categorias estão marcadas."""
+    if post_data is not None:
+        return {
+            cat_key: bool(post_data.get(field_name, ''))
+            for cat_key, field_name in _CATEGORY_FIELD_MAP
+        }
+    if player is not None:
+        existing = set(player.category_rankings.values_list('categoria', flat=True))
+        return {cat_key: cat_key in existing for cat_key, _ in _CATEGORY_FIELD_MAP}
+    return {cat_key: False for cat_key, _ in _CATEGORY_FIELD_MAP}
+
+
 class PlayerCreateView(CreateView):
     model = Player
     form_class = PlayerForm
@@ -76,6 +89,9 @@ class PlayerCreateView(CreateView):
         ctx = super().get_context_data(**kwargs)
         ctx['title'] = 'Novo Jogador'
         ctx['ranking_form'] = PlayerCategoryRankingForm(self.request.POST or None)
+        ctx['ranking_checked'] = _build_ranking_checked(
+            post_data=self.request.POST if self.request.method == 'POST' else None
+        )
         return ctx
 
     def form_valid(self, form):
@@ -97,21 +113,19 @@ class PlayerUpdateView(UpdateView):
     template_name = 'players/form.html'
     success_url = reverse_lazy('players:list')
 
-    def _initial_ranking_data(self):
-        return {
-            f'pontos_{r.categoria}': r.pontos
-            for r in self.object.category_rankings.all()
-        }
-
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['title'] = f'Editar — {self.object.name}'
-        if self.request.POST:
+        if self.request.method == 'POST':
             ctx['ranking_form'] = PlayerCategoryRankingForm(self.request.POST)
+            ctx['ranking_checked'] = _build_ranking_checked(post_data=self.request.POST)
         else:
-            ctx['ranking_form'] = PlayerCategoryRankingForm(
-                initial=self._initial_ranking_data()
-            )
+            initial = {
+                f'pontos_{r.categoria}': r.pontos
+                for r in self.object.category_rankings.all()
+            }
+            ctx['ranking_form'] = PlayerCategoryRankingForm(initial=initial)
+            ctx['ranking_checked'] = _build_ranking_checked(player=self.object)
         return ctx
 
     def form_valid(self, form):
