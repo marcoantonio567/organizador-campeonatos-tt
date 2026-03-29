@@ -1,9 +1,10 @@
 from django.db import models
-from players.models import Player
+from players.models import Player, CATEGORY_CHOICES
 
 
 class Championship(models.Model):
     name = models.CharField('Nome', max_length=200)
+    categoria = models.CharField('Categoria', max_length=20, choices=CATEGORY_CHOICES, default='iniciante')
     data_inicio = models.DateField('Data')
     local = models.CharField('Local', max_length=200)
     finalizado = models.BooleanField('Finalizado', default=False)

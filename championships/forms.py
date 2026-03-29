@@ -1,16 +1,17 @@
 from django import forms
 from .models import Championship, Enrollment
-from players.models import Player
+from players.models import Player, PlayerCategoryRanking
 
 
 class ChampionshipForm(forms.ModelForm):
     class Meta:
         model = Championship
-        fields = ['name', 'data_inicio', 'local']
+        fields = ['name', 'categoria', 'data_inicio', 'local']
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'name':        forms.TextInput(attrs={'class': 'form-control'}),
+            'categoria':   forms.Select(attrs={'class': 'form-select'}),
             'data_inicio': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-            'local': forms.TextInput(attrs={'class': 'form-control'}),
+            'local':       forms.TextInput(attrs={'class': 'form-control'}),
         }
 
 
@@ -26,7 +27,18 @@ class EnrollPlayerForm(forms.Form):
         enrolled_ids = Enrollment.objects.filter(
             championship=championship
         ).values_list('player_id', flat=True)
-        self.fields['player'].queryset = Player.objects.exclude(id__in=enrolled_ids)
+
+        # Apenas jogadores com ranking na categoria do campeonato
+        eligible_ids = PlayerCategoryRanking.objects.filter(
+            categoria=championship.categoria
+        ).values_list('player_id', flat=True)
+
+        self.fields['player'].queryset = (
+            Player.objects
+            .filter(id__in=eligible_ids)
+            .exclude(id__in=enrolled_ids)
+            .order_by('name')
+        )
 
 
 class GenerateGroupsForm(forms.Form):
