@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% block title %}{{ championship.name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h2 class="mb-0">{{ championship.name }}</h2>
+    <span class="badge badge-status-{{ championship.status }} mt-1">{{ championship.get_status_display }}</span>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'championships:update' championship.pk %}" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-pencil"></i> Editar
+    </a>
+    {% if championship.groups.exists %}
+    <a href="{% url 'championships:groups' championship.pk %}" class="btn btn-outline-primary btn-sm">
+      <i class="bi bi-grid"></i> Grupos
+    </a>
+    {% endif %}
+    {% if championship.status == 'eliminatorias' or championship.status == 'finalizado' %}
+    <a href="{% url 'championships:bracket' championship.pk %}" class="btn btn-outline-danger btn-sm">
+      <i class="bi bi-diagram-3"></i> Chave
+    </a>
+    {% endif %}
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-body text-center">
+        <div class="h4 fw-bold">{{ enrollments.count }}</div>
+        <div class="text-muted">Inscritos</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-body text-center">
+        <div class="h4 fw-bold">{{ championship.local }}</div>
+        <div class="text-muted">Local</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-body text-center">
+        <div class="h4 fw-bold">{{ championship.data_inicio }}</div>
+        <div class="text-muted">Início</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Inscritos -->
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <strong>Inscritos</strong>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-sm mb-0">
+          <thead>
+            <tr><th>#</th><th>Jogador</th><th>Ranking</th><th></th></tr>
+          </thead>
+          <tbody>
+            {% for enrollment in enrollments %}
+            <tr>
+              <td class="text-muted">{{ forloop.counter }}</td>
+              <td>{{ enrollment.player.name }}</td>
+              <td>{{ enrollment.player.ranking_atual }} pts</td>
+              <td>
+                <form method="post" action="{% url 'championships:remove_enrollment' championship.pk enrollment.pk %}" class="d-inline">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-link btn-sm text-danger p-0">
+                    <i class="bi bi-x-lg"></i>
+                  </button>
+                </form>
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="text-muted text-center py-3">Nenhum inscrito.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ações -->
+  <div class="col-md-6">
+    <!-- Inscrever jogador -->
+    <div class="card mb-3">
+      <div class="card-header"><strong>Inscrever Jogador</strong></div>
+      <div class="card-body">
+        <form method="post" action="{% url 'championships:enroll' championship.pk %}" class="d-flex gap-2">
+          {% csrf_token %}
+          {{ enroll_form.player }}
+          <button type="submit" class="btn btn-primary btn-sm">Inscrever</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Gerar Grupos -->
+    {% if championship.status != 'eliminatorias' and championship.status != 'finalizado' %}
+    <div class="card mb-3">
+      <div class="card-header"><strong>Gerar Fase de Grupos</strong></div>
+      <div class="card-body">
+        <form method="post" action="{% url 'championships:generate_groups' championship.pk %}" class="d-flex gap-2 align-items-end">
+          {% csrf_token %}
+          <div>
+            <label class="form-label mb-1 small">Nº de grupos</label>
+            {{ generate_groups_form.num_groups }}
+          </div>
+          <button type="submit" class="btn btn-warning btn-sm">Gerar Grupos</button>
+        </form>
+        <small class="text-muted">⚠️ Isso apagará grupos existentes e recriará tudo.</small>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Gerar Chave Eliminatória -->
+    {% if championship.status == 'fase_grupos' %}
+    <div class="card">
+      <div class="card-header"><strong>Fase Eliminatória</strong></div>
+      <div class="card-body">
+        <p class="small text-muted">Gera a chave com os classificados de cada grupo.</p>
+        <form method="post" action="{% url 'championships:generate_elimination' championship.pk %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger btn-sm">Gerar Chave Eliminatória</button>
+        </form>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

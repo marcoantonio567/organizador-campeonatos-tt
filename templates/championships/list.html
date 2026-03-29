@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}Campeonatos{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2><i class="bi bi-trophy"></i> Campeonatos</h2>
+  <a href="{% url 'championships:create' %}" class="btn btn-primary">
+    <i class="bi bi-plus-lg"></i> Novo Campeonato
+  </a>
+</div>
+
+<div class="row g-3">
+  {% for ch in championships %}
+  <div class="col-md-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+          <h5 class="card-title mb-1">{{ ch.name }}</h5>
+          <span class="badge badge-status-{{ ch.status }}">{{ ch.get_status_display }}</span>
+        </div>
+        <p class="text-muted small mb-2">
+          <i class="bi bi-geo-alt"></i> {{ ch.local }}<br>
+          <i class="bi bi-calendar"></i> {{ ch.data_inicio }} → {{ ch.data_fim }}
+        </p>
+        <p class="text-muted small">
+          <i class="bi bi-people"></i> {{ ch.enrollments.count }} inscritos
+        </p>
+      </div>
+      <div class="card-footer bg-transparent d-flex gap-2">
+        <a href="{% url 'championships:detail' ch.pk %}" class="btn btn-sm btn-primary">
+          <i class="bi bi-eye"></i> Detalhes
+        </a>
+        {% if ch.groups.exists %}
+        <a href="{% url 'championships:groups' ch.pk %}" class="btn btn-sm btn-outline-secondary">
+          Grupos
+        </a>
+        {% endif %}
+        {% if ch.status == 'eliminatorias' or ch.status == 'finalizado' %}
+        <a href="{% url 'championships:bracket' ch.pk %}" class="btn btn-sm btn-outline-danger">
+          Chave
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <div class="col">
+    <div class="alert alert-info">Nenhum campeonato cadastrado ainda.</div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}{{ player.name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2>{{ player.name }}</h2>
+  <div>
+    <a href="{% url 'players:update' player.pk %}" class="btn btn-outline-secondary">
+      <i class="bi bi-pencil"></i> Editar
+    </a>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-md-4">
+    <div class="card text-center">
+      <div class="card-body">
+        <div class="display-4 fw-bold text-primary">{{ player.ranking_atual }}</div>
+        <div class="text-muted">pontos de ranking</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card text-center">
+      <div class="card-body">
+        <div class="display-6 fw-bold">{{ player.get_categoria_display }}</div>
+        <div class="text-muted">categoria</div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

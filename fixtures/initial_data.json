@@ -1,0 +1,36 @@
+[
+  {"model": "players.player", "pk": 1, "fields": {"name": "Carlos Silva", "ranking_atual": 2400, "categoria": "avancado", "created_at": "2025-01-01T00:00:00Z"}},
+  {"model": "players.player", "pk": 2, "fields": {"name": "Ana Oliveira", "ranking_atual": 2250, "categoria": "avancado", "created_at": "2025-01-01T00:00:00Z"}},
+  {"model": "players.player", "pk": 3, "fields": {"name": "Pedro Santos", "ranking_atual": 2100, "categoria": "avancado", "created_at": "2025-01-01T00:00:00Z"}},
+  {"model": "players.player", "pk": 4, "fields": {"name": "Mariana Costa", "ranking_atual": 1950, "categoria": "avancado", "created_at": "2025-01-01T00:00:00Z"}},
+  {"model": "players.player", "pk": 5, "fields": {"name": "Lucas Ferreira", "ranking_atual": 1800, "categoria": "avancado", "created_at": "2025-01-01T00:00:00Z"}},
+  {"model": "players.player", "pk": 6, "fields": {"name": "Juliana Rocha", "ranking_atual": 1700, "categoria": "intermediario", "created_at": "2025-01-01T00:00:00Z"}},
+  {"model": "players.player", "pk": 7, "fields": {"name": "Rafael Lima", "ranking_atual": 1600, "categoria": "intermediario", "created_at": "2025-01-01T00:00:00Z"}},
+  {"model": "players.player", "pk": 8, "fields": {"name": "Camila Pereira", "ranking_atual": 1500, "categoria": "intermediario", "created_at": "2025-01-01T00:00:00Z"}},
+  {"model": "players.player", "pk": 9, "fields": {"name": "Fernando Alves", "ranking_atual": 1400, "categoria": "intermediario", "created_at": "2025-01-01T00:00:00Z"}},
+  {"model": "players.player", "pk": 10, "fields": {"name": "Beatriz Nunes", "ranking_atual": 1300, "categoria": "intermediario", "created_at": "2025-01-01T00:00:00Z"}},
+  {"model": "players.player", "pk": 11, "fields": {"name": "Thiago Carvalho", "ranking_atual": 1200, "categoria": "iniciante", "created_at": "2025-01-01T00:00:00Z"}},
+  {"model": "players.player", "pk": 12, "fields": {"name": "Larissa Martins", "ranking_atual": 1100, "categoria": "iniciante", "created_at": "2025-01-01T00:00:00Z"}},
+
+  {"model": "championships.championship", "pk": 1, "fields": {
+    "name": "Campeonato Municipal 2025",
+    "data_inicio": "2025-06-01",
+    "data_fim": "2025-06-15",
+    "local": "Ginásio Municipal Centro",
+    "status": "inscricoes",
+    "created_at": "2025-01-01T00:00:00Z"
+  }},
+
+  {"model": "championships.enrollment", "pk": 1,  "fields": {"championship": 1, "player": 1,  "seed": 1,  "enrolled_at": "2025-01-01T00:00:00Z"}},
+  {"model": "championships.enrollment", "pk": 2,  "fields": {"championship": 1, "player": 2,  "seed": 2,  "enrolled_at": "2025-01-01T00:00:00Z"}},
+  {"model": "championships.enrollment", "pk": 3,  "fields": {"championship": 1, "player": 3,  "seed": 3,  "enrolled_at": "2025-01-01T00:00:00Z"}},
+  {"model": "championships.enrollment", "pk": 4,  "fields": {"championship": 1, "player": 4,  "seed": 4,  "enrolled_at": "2025-01-01T00:00:00Z"}},
+  {"model": "championships.enrollment", "pk": 5,  "fields": {"championship": 1, "player": 5,  "seed": 5,  "enrolled_at": "2025-01-01T00:00:00Z"}},
+  {"model": "championships.enrollment", "pk": 6,  "fields": {"championship": 1, "player": 6,  "seed": 6,  "enrolled_at": "2025-01-01T00:00:00Z"}},
+  {"model": "championships.enrollment", "pk": 7,  "fields": {"championship": 1, "player": 7,  "seed": 7,  "enrolled_at": "2025-01-01T00:00:00Z"}},
+  {"model": "championships.enrollment", "pk": 8,  "fields": {"championship": 1, "player": 8,  "seed": 8,  "enrolled_at": "2025-01-01T00:00:00Z"}},
+  {"model": "championships.enrollment", "pk": 9,  "fields": {"championship": 1, "player": 9,  "seed": 9,  "enrolled_at": "2025-01-01T00:00:00Z"}},
+  {"model": "championships.enrollment", "pk": 10, "fields": {"championship": 1, "player": 10, "seed": 10, "enrolled_at": "2025-01-01T00:00:00Z"}},
+  {"model": "championships.enrollment", "pk": 11, "fields": {"championship": 1, "player": 11, "seed": 11, "enrolled_at": "2025-01-01T00:00:00Z"}},
+  {"model": "championships.enrollment", "pk": 12, "fields": {"championship": 1, "player": 12, "seed": 12, "enrolled_at": "2025-01-01T00:00:00Z"}}
+]

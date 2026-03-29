@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% block title %}Chave — {{ championship.name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2><i class="bi bi-diagram-3"></i> Chave Eliminatória — {{ championship.name }}</h2>
+  <a href="{% url 'championships:detail' championship.pk %}" class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-arrow-left"></i> Voltar
+  </a>
+</div>
+
+{% if bracket %}
+<div class="d-flex gap-4 overflow-auto pb-3">
+  {% for phase_name, phase_matches in bracket.items %}
+  <div class="bracket-round">
+    <h6 class="text-center text-muted mb-3 text-uppercase fw-bold small">{{ phase_name }}</h6>
+    {% for match in phase_matches %}
+    <div class="bracket-match">
+      <div class="d-flex justify-content-between align-items-center mb-1
+        {% if match.winner == match.player_a %}winner{% endif %}">
+        <span>
+          {% if match.player_a %}{{ match.player_a.name }}{% else %}<em class="text-muted">A definir</em>{% endif %}
+        </span>
+        <span class="badge bg-dark ms-2">{{ match.score_a }}</span>
+      </div>
+      <hr class="my-1">
+      <div class="d-flex justify-content-between align-items-center
+        {% if match.winner == match.player_b %}winner{% endif %}">
+        <span>
+          {% if match.player_b %}{{ match.player_b.name }}{% else %}<em class="text-muted">A definir</em>{% endif %}
+        </span>
+        <span class="badge bg-dark ms-2">{{ match.score_b }}</span>
+      </div>
+      <div class="mt-2 text-end">
+        {% if match.status == 'finalizada' %}
+          <span class="badge bg-success small">Finalizada</span>
+        {% else %}
+          <a href="{% url 'matches:update' match.pk %}" class="btn btn-xs btn-outline-primary btn-sm py-0">
+            <i class="bi bi-pencil-square"></i> Resultado
+          </a>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-warning">
+  Nenhuma partida eliminatória gerada.
+  <form method="post" action="{% url 'championships:generate_elimination' championship.pk %}" class="d-inline ms-2">
+    {% csrf_token %}
+    <button class="btn btn-warning btn-sm">Gerar Agora</button>
+  </form>
+</div>
+{% endif %}
+
+<!-- Lista completa das partidas -->
+<div class="card mt-4">
+  <div class="card-header"><strong>Todas as Partidas Eliminatórias</strong></div>
+  <div class="card-body p-0">
+    <table class="table table-sm mb-0">
+      <thead class="table-dark">
+        <tr><th>Fase</th><th>Jogador A</th><th>Placar</th><th>Jogador B</th><th>Vencedor</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for match in matches %}
+        <tr>
+          <td><span class="badge bg-secondary">{{ match.get_phase_display }}</span></td>
+          <td {% if match.winner == match.player_a %}class="fw-bold text-success"{% endif %}>
+            {{ match.player_a|default:"A definir" }}
+          </td>
+          <td class="text-center">
+            {% if match.status == 'finalizada' %}
+              <span class="badge bg-dark">{{ match.score_a }} × {{ match.score_b }}</span>
+            {% else %}
+              <span class="text-muted">-</span>
+            {% endif %}
+          </td>
+          <td {% if match.winner == match.player_b %}class="fw-bold text-success"{% endif %}>
+            {{ match.player_b|default:"A definir" }}
+          </td>
+          <td>
+            {% if match.winner %}<span class="badge bg-success">{{ match.winner.name }}</span>{% endif %}
+          </td>
+          <td>
+            {% if match.status != 'finalizada' and match.player_a and match.player_b %}
+            <a href="{% url 'matches:update' match.pk %}" class="btn btn-sm btn-outline-primary">
+              <i class="bi bi-pencil-square"></i>
+            </a>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="text-center text-muted py-3">Nenhuma partida.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

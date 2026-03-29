@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Registrar Resultado{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-5">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">
+          <i class="bi bi-pencil-square"></i>
+          Resultado da Partida
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="text-center mb-4">
+          <span class="badge bg-secondary mb-2">{{ match.get_phase_display }}</span>
+          <div class="d-flex justify-content-center align-items-center gap-3 mt-2">
+            <div class="text-center">
+              <div class="fw-bold fs-5">{{ match.player_a }}</div>
+              <small class="text-muted">Jogador A</small>
+            </div>
+            <span class="text-muted">vs</span>
+            <div class="text-center">
+              <div class="fw-bold fs-5">{{ match.player_b }}</div>
+              <small class="text-muted">Jogador B</small>
+            </div>
+          </div>
+        </div>
+
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3 mb-3">
+            <div class="col-6">
+              <label class="form-label">Sets — {{ match.player_a }}</label>
+              {{ form.score_a }}
+            </div>
+            <div class="col-6">
+              <label class="form-label">Sets — {{ match.player_b }}</label>
+              {{ form.score_b }}
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Status</label>
+            {{ form.status }}
+          </div>
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">Salvar Resultado</button>
+            <a href="javascript:history.back()" class="btn btn-outline-secondary">Cancelar</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
