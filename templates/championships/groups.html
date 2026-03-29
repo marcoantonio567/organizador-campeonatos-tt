@@ -62,7 +62,6 @@
               <tr>
                 <th style="width:36px">#</th>
                 <th>Jogador</th>
-                <th title="Pontos" style="width:36px">P</th>
                 <th title="Vitórias" style="width:36px">V</th>
                 <th title="Derrotas" style="width:36px">D</th>
                 <th title="Sets Ganhos" style="width:36px">S+</th>
@@ -96,7 +95,6 @@
                     {% endif %}
                   </div>
                 </td>
-                <td><strong style="color:var(--tt-primary)">{{ standing.points }}</strong></td>
                 <td class="text-success">{{ standing.wins }}</td>
                 <td class="text-danger">{{ standing.losses }}</td>
                 <td>{{ standing.sets_won }}</td>
@@ -136,7 +134,7 @@
         </div>
         <div class="d-flex gap-3 mt-2" style="font-size:.75rem;color:var(--tt-text-muted)">
           <span><span style="color:var(--tt-success)">■</span> Classificado</span>
-          <span>P=Pontos · V=Vitórias · D=Derrotas · SD=Saldo</span>
+          <span>V=Vitórias · D=Derrotas · S+=Sets ganhos · S-=Sets perdidos · SD=Saldo</span>
         </div>
       </div>
 
