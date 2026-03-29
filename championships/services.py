@@ -12,34 +12,68 @@ from matches.models import Match
 # Group Phase
 # ──────────────────────────────────────────────
 
+def _get_avancado_ranking_map():
+    """Retorna dict {player_id: pontos} para a categoria avançado."""
+    from players.models import PlayerCategoryRanking
+    return {
+        r.player_id: r.pontos
+        for r in PlayerCategoryRanking.objects.filter(categoria='avancado')
+    }
+
+
+def get_seeds_for_championship(championship, num_groups: int):
+    """
+    Retorna a lista dos cabeças de chave (seeds) para um campeonato avançado.
+    São os top N jogadores inscritos ordenados pelo ranking avançado.
+    """
+    if championship.categoria != 'avancado':
+        return []
+    ranking_map = _get_avancado_ranking_map()
+    players = [
+        e.player
+        for e in Enrollment.objects.filter(championship=championship).select_related('player')
+    ]
+    players.sort(key=lambda p: ranking_map.get(p.id, 0), reverse=True)
+    return players[:num_groups]
+
+
 def generate_groups(championship: Championship, num_groups: int) -> list:
     """
-    Distribute enrolled players into groups using snake-draft by ranking.
+    Distribui os jogadores nos grupos via snake-draft.
 
-    Example with 8 players, 2 groups (seed order 1..8):
-        Round 1:  1→A, 2→B
-        Round 2:  3→B, 4→A   (reversed)
-        Round 3:  5→A, 6→B
-        ...
-    This balances group strength.
+    Para categoria AVANÇADO:
+      - Os top N jogadores (por ranking avançado) são cabeças de chave.
+      - Cada cabeça de chave vai obrigatoriamente para um grupo diferente
+        (Seed 1 → Grupo A, Seed 2 → Grupo B, …).
+      - Os demais são distribuídos via snake-draft nos grupos restantes.
+
+    Para outras categorias: snake-draft puro por ordem de inscrição.
     """
     if num_groups < 1:
         raise ValueError('Número de grupos deve ser pelo menos 1.')
 
-    enrollments = (
-        Enrollment.objects
-        .filter(championship=championship)
-        .select_related('player')
-        .order_by('seed')
-    )
-    players = [e.player for e in enrollments]
+    if championship.categoria == 'avancado':
+        ranking_map = _get_avancado_ranking_map()
+        all_players = [
+            e.player
+            for e in Enrollment.objects.filter(championship=championship).select_related('player')
+        ]
+        all_players.sort(key=lambda p: ranking_map.get(p.id, 0), reverse=True)
+    else:
+        all_players = [
+            e.player
+            for e in Enrollment.objects
+                .filter(championship=championship)
+                .select_related('player')
+                .order_by('seed')
+        ]
 
-    if len(players) < num_groups:
+    if len(all_players) < num_groups:
         raise ValueError(
-            f'Apenas {len(players)} inscritos para {num_groups} grupos.'
+            f'Apenas {len(all_players)} inscritos para {num_groups} grupos.'
         )
 
-    # Remove existing groups (cascades to GroupPlayer, GroupStanding, group Matches)
+    # Remove grupos existentes
     championship.groups.all().delete()
 
     group_names = [chr(65 + i) for i in range(num_groups)]
@@ -47,12 +81,27 @@ def generate_groups(championship: Championship, num_groups: int) -> list:
         Group.objects.create(championship=championship, name=n) for n in group_names
     ]
 
-    # Snake draft
-    for idx, player in enumerate(players):
-        cycle = idx % (num_groups * 2)
-        group_idx = cycle if cycle < num_groups else (num_groups * 2 - 1 - cycle)
-        GroupPlayer.objects.create(group=groups[group_idx], player=player)
-        GroupStanding.objects.create(group=groups[group_idx], player=player)
+    if championship.categoria == 'avancado':
+        # Cabeças de chave: um por grupo, na ordem do ranking
+        seeds = all_players[:num_groups]
+        rest  = all_players[num_groups:]
+
+        for i, seed in enumerate(seeds):
+            GroupPlayer.objects.create(group=groups[i], player=seed)
+            GroupStanding.objects.create(group=groups[i], player=seed)
+
+        # Snake-draft para os demais
+        for idx, player in enumerate(rest):
+            cycle     = idx % (num_groups * 2)
+            group_idx = cycle if cycle < num_groups else (num_groups * 2 - 1 - cycle)
+            GroupPlayer.objects.create(group=groups[group_idx], player=player)
+            GroupStanding.objects.create(group=groups[group_idx], player=player)
+    else:
+        for idx, player in enumerate(all_players):
+            cycle     = idx % (num_groups * 2)
+            group_idx = cycle if cycle < num_groups else (num_groups * 2 - 1 - cycle)
+            GroupPlayer.objects.create(group=groups[group_idx], player=player)
+            GroupStanding.objects.create(group=groups[group_idx], player=player)
 
     return groups
 

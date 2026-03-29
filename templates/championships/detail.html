@@ -71,24 +71,45 @@
   <!-- Inscritos -->
   <div class="col-md-6">
     <div class="card">
-      <div class="card-header"><strong>Inscritos</strong></div>
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <strong>Inscritos</strong>
+        <span class="badge bg-secondary">{{ enrollments|length }}</span>
+      </div>
+      {% if championship.categoria == 'avancado' and enrollments %}
+      <div class="alert alert-warning alert-sm mb-0 py-2 px-3 rounded-0 border-0 border-bottom small">
+        <i class="bi bi-trophy-fill text-warning"></i>
+        <strong>Cabeças de Chave:</strong> ao gerar os grupos, os <strong>N primeiros do ranking</strong>
+        (onde N = nº de grupos) serão distribuídos um por grupo.
+      </div>
+      {% endif %}
       <div class="card-body p-0">
         <table class="table table-sm mb-0">
           <thead>
-            <tr><th>#</th><th>Jogador</th><th>Categorias</th><th></th></tr>
+            {% if championship.categoria == 'avancado' %}
+            <tr><th>#</th><th>Jogador</th><th class="text-end">Pts Ranking</th><th></th></tr>
+            {% else %}
+            <tr><th>#</th><th>Jogador</th><th></th></tr>
+            {% endif %}
           </thead>
           <tbody>
             {% for enrollment in enrollments %}
-            <tr>
-              <td class="text-muted">{{ forloop.counter }}</td>
-              <td>{{ enrollment.player.name }}</td>
-              <td>
-                {% for ranking in enrollment.player.category_rankings.all %}
-                  <span class="badge bg-secondary me-1">{{ ranking.get_categoria_display }}: {{ ranking.pontos }} pts</span>
-                {% empty %}
-                  <span class="text-muted">—</span>
-                {% endfor %}
+            <tr {% if championship.categoria == 'avancado' and forloop.counter <= championship.groups.count and championship.groups.exists %}class="table-warning"{% endif %}>
+              <td class="text-muted">
+                {% if championship.categoria == 'avancado' and enrollment.player.pk in seed_player_ids %}
+                  <i class="bi bi-trophy-fill text-warning" title="Cabeça de Chave"></i>
+                {% else %}
+                  {{ forloop.counter }}
+                {% endif %}
               </td>
+              <td>
+                {{ enrollment.player.name }}
+                {% if championship.categoria == 'avancado' and enrollment.player.pk in seed_player_ids %}
+                  <span class="badge text-bg-warning ms-1 small">Cabeça de Chave</span>
+                {% endif %}
+              </td>
+              {% if championship.categoria == 'avancado' %}
+              <td class="text-end fw-bold">{{ enrollment.avancado_pontos }} pts</td>
+              {% endif %}
               <td>
                 <form method="post" action="{% url 'championships:remove_enrollment' championship.pk enrollment.pk %}" class="d-inline">
                   {% csrf_token %}

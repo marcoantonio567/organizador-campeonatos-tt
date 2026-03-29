@@ -9,6 +9,8 @@ from .services import (
     generate_groups,
     generate_round_robin,
     generate_elimination_bracket,
+    get_seeds_for_championship,
+    _get_avancado_ranking_map,
 )
 from matches.models import Match
 from players.models import Player
@@ -63,7 +65,24 @@ class ChampionshipDetailView(DetailView):
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         championship = self.object
-        ctx['enrollments'] = championship.enrollments.select_related('player').order_by('seed')
+
+        if championship.categoria == 'avancado':
+            ranking_map = _get_avancado_ranking_map()
+            enrollments = sorted(
+                championship.enrollments.select_related('player'),
+                key=lambda e: ranking_map.get(e.player_id, 0),
+                reverse=True,
+            )
+            # Anota cada enrollment com os pontos para uso direto no template
+            for e in enrollments:
+                e.avancado_pontos = ranking_map.get(e.player_id, 0)
+            num_groups = championship.groups.count()
+            ctx['seed_player_ids'] = {e.player_id for e in enrollments[:num_groups]} if num_groups > 0 else set()
+        else:
+            enrollments = list(championship.enrollments.select_related('player').order_by('seed'))
+            ctx['seed_player_ids'] = set()
+
+        ctx['enrollments'] = enrollments
         ctx['enroll_form'] = EnrollPlayerForm(championship)
         ctx['generate_groups_form'] = GenerateGroupsForm()
         ctx['has_bracket'] = championship.matches.exclude(phase='grupo').exists()
@@ -132,10 +151,24 @@ class GroupsView(DetailView):
     def get_context_data(self, **kwargs):
         from django.db.models import Q
         ctx = super().get_context_data(**kwargs)
-        groups = self.object.groups.prefetch_related(
+        championship = self.object
+        groups = championship.groups.prefetch_related(
             'standings__player', 'matches__player_a', 'matches__player_b', 'matches__winner'
         ).all()
         ctx['groups'] = groups
+
+        # Identificar cabeças de chave para avançado
+        if championship.categoria == 'avancado':
+            ranking_map = _get_avancado_ranking_map()
+            seed_ids = set()
+            for group in groups:
+                group_players = list(group.get_players())
+                if group_players:
+                    top = max(group_players, key=lambda p: ranking_map.get(p.id, 0))
+                    seed_ids.add(top.id)
+            ctx['seed_ids'] = seed_ids
+        else:
+            ctx['seed_ids'] = set()
 
         # Anexa played_ids em cada grupo para uso direto no template
         for group in groups:
@@ -327,6 +360,30 @@ class MovePlayerGroupView(View):
         if GroupPlayer.objects.filter(group=target_group, player=player).exists():
             messages.error(request, f'{player.name} já está no Grupo {target_group.name}.')
             return redirect('championships:groups', pk=pk)
+
+        # Para campeonatos avançados: impede mover cabeça de chave para grupo que já tem outro
+        if championship.categoria == 'avancado':
+            ranking_map = _get_avancado_ranking_map()
+
+            def is_seed(p, group):
+                group_players = list(group.get_players())
+                if not group_players:
+                    return False
+                top = max(group_players, key=lambda x: ranking_map.get(x.id, 0))
+                return p.id == top.id
+
+            player_is_seed = is_seed(player, source_group)
+
+            if player_is_seed:
+                target_players = list(target_group.get_players())
+                if target_players:
+                    target_seed = max(target_players, key=lambda x: ranking_map.get(x.id, 0))
+                    messages.error(
+                        request,
+                        f'{player.name} é cabeça de chave e não pode ser movido para o Grupo '
+                        f'{target_group.name}, pois {target_seed.name} já é cabeça de chave lá.'
+                    )
+                    return redirect('championships:groups', pk=pk)
 
         GroupPlayer.objects.filter(group=source_group, player=player).update(group=target_group)
         GroupStanding.objects.filter(group=source_group, player=player).update(group=target_group)
