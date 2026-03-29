@@ -27,12 +27,12 @@
   </div>
   <div class="d-flex gap-2 flex-wrap">
     {% if championship.groups.exists %}
-    <a href="{% url 'championships:groups' championship.pk %}" class="tt-btn ghost sm">
+    <a href="{% url 'championships:groups' championship.pk %}" class="tt-btn primary">
       <i class="bi bi-grid-3x3-gap"></i> Grupos
     </a>
     {% endif %}
     {% if has_bracket %}
-    <a href="{% url 'championships:bracket' championship.pk %}" class="tt-btn ghost sm">
+    <a href="{% url 'championships:bracket' championship.pk %}" class="tt-btn accent">
       <i class="bi bi-diagram-3-fill"></i> Chave
     </a>
     {% endif %}
