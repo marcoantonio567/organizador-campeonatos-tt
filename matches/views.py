@@ -21,9 +21,8 @@ class MatchUpdateView(UpdateView):
         return reverse('championships:bracket', kwargs={'pk': match.championship_id})
 
     def form_valid(self, form):
+        form.instance.status = 'finalizada'
         response = super().form_valid(form)
-        match = self.object
-        if match.status == 'finalizada':
-            advance_winner(match)
-            messages.success(self.request, 'Resultado registrado.')
+        advance_winner(self.object)
+        messages.success(self.request, 'Resultado registrado.')
         return response
