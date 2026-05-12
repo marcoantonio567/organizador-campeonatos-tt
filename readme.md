@@ -1,111 +1,111 @@
-# 🏓 Organizador de Campeonatos de Tênis de Mesa
+# 🏓 Table Tennis Tournament Organizer
 
-Sistema web desenvolvido em **Django** para gerenciamento completo de campeonatos de tênis de mesa, incluindo cadastro de jogadores, organização de torneios, geração de confrontos e acompanhamento das partidas.
-
----
-
-## 🚀 Funcionalidades
-
-* 📌 Cadastro de campeonatos
-* 👥 Cadastro de participantes
-* 🏆 Sistema de ranking
-* 🔀 Geração automática de rodadas (Sistema Suíço)
-* 🎯 Fases eliminatórias (mata-mata)
-* 📊 Controle de resultados das partidas
-* 📺 Visualização de chaveamentos (brackets)
-* 🧠 Organização automática dos confrontos
-* 🔎 Consulta de standings (classificação geral)
+Web-based system developed in **Django** for complete management of table tennis tournaments, including player registration, tournament organization, match generation, and match tracking.
 
 ---
 
-## 🧱 Tecnologias Utilizadas
+## 🚀 Features
+
+* 📌 Championship registration
+* 👥 Participant registration
+* 🏆 Ranking system
+* 🔀 Automatic round generation (Swiss System)
+* 🎯 Elimination phases (knockout)
+* 📊 Match results control
+* 📺 Bracket visualization
+* 🧠 Automatic match organization
+* 🔎 Standings consultation (overall classification)
+
+---
+
+## 🧱 Technologies Used
 
 * 🐍 Python 3.x
 * 🌐 Django
-* 🗄️ SQLite (padrão, podendo migrar para PostgreSQL)
+* 🗄️ SQLite (default, can be migrated to PostgreSQL)
 * 🎨 HTML + CSS + Bootstrap
-* ⚙️ JavaScript (para interações e visualização de chaves)
+* ⚙️ JavaScript (for interactions and visualization) (keys)
 
 ---
 
-## 📁 Estrutura do Projeto
+## 📁 Project Structure
 
 ```
-organizador-campeonatos-tt/
+organizer-championships-tt/
 │
-├── core/                # App principal (torneios, lógica)
-├── usuarios/            # Autenticação e usuários
-├── static/              # Arquivos estáticos (CSS, JS)
-├── templates/           # Templates HTML
-├── db.sqlite3           # Banco de dados
+├── core/ # Main app (tournaments, logic)
+├── users/ # Authentication and users
+├── static/ # Static files (CSS, JS)
+├── templates/ # HTML templates
+├── db.sqlite3 # Database
 ├── manage.py
 └── README.md
 ```
 
 ---
 
-## ⚙️ Como rodar o projeto
+## ⚙️ How to run the project
 
-### 1. Clone o repositório
+### 1. Clone the repository
 
 ```bash
-git clone https://github.com/marcoantonio567/organizador-campeonatos-tt.git
-cd organizador-campeonatos-tt
-```
+git clone https://github.com/marcoantonio567/organizador-campeonatos-tt.git cd organizar-campeonatos-tt
 
-### 2. Crie um ambiente virtual
+
+### 2. Create a virtual environment
 
 ```bash
 python -m venv venv
+
 ```
 
-Ative:
+Activate:
 
 * Windows:
 
-```bash
-venv\Scripts\activate
+```
+bash venv\Scripts\activate
 ```
 
 * Linux/Mac:
 
-```bash
-source venv/bin/activate
+```
+bash source venv/bin/activate
 ```
 
 ---
 
-### 3. Instale as dependências
+### 3. Install dependencies
 
-```bash
-pip install -r requirements.txt
+```
+bash pip install -r requirements.txt
 ```
 
 ---
 
-### 4. Rode as migrações
+### 4. Run migrations
 
-```bash
-python manage.py migrate
+```
+bash python manage.py migrate
 ```
 
 ---
 
-### 5. Crie um superusuário
+### 5. Create a superuser
 
-```bash
-python manage.py createsuperuser
+```
+bash python manage.py createsuperuser
 ```
 
 ---
 
-### 6. Execute o servidor
+### 6. Run the server
 
 ```bash
 python manage.py runserver
 ```
 
-Acesse no navegador:
+Access in your browser:
 
 ```
 http://127.0.0.1:8000/
@@ -113,75 +113,60 @@ http://127.0.0.1:8000/
 
 ---
 
-## 🧠 Regras do Sistema
+## 🧠 System Rules
 
-### Sistema Suíço
+### Swiss System
 
-* Jogadores enfrentam adversários com desempenho semelhante
-* Evita confrontos repetidos
-* Pontuação acumulativa
+* Players face opponents with similar performance
+* Avoids repeated matches
+* Cumulative scoring
 
-### Fase Eliminatória
+### Elimination Phase
 
-* Classificação dos melhores do suíço
-* Confrontos em formato mata-mata
-* Definição do campeão
+* Ranking of the best Swiss players
+* Knockout format matches
+* Champion determination
 
 ---
 
-## 📊 Modelagem (Resumo)
+## 📊 Modeling (Summary)
 
-* **Campeonato**
-* **Jogador**
-* **Partida**
-* **Rodada**
+* **Championship**
+* **Player**
+* **Match**
+* **Round**
 * **Ranking**
 
 ---
 
-## 🎯 Objetivo do Projeto
+## 🎯 Project Objective
 
-Este sistema foi desenvolvido para:
+This system was developed For:
 
-* Facilitar a organização de campeonatos locais
-* Automatizar o chaveamento e confrontos
-* Melhorar a experiência de gestão de torneios
-* Servir como base para projetos maiores (SaaS de torneios)
-
----
-
-## 🔮 Possíveis melhorias futuras
-
-* 📱 Interface mobile responsiva
-* 📡 API REST com Django Rest Framework
-* 🏅 Sistema de histórico de jogadores
-* 📈 Estatísticas avançadas
-* 🎥 Integração com telão (display de partidas)
-* ☁️ Deploy em nuvem (AWS / Render)
+* Facilitating the organization of local championships
+* Automating brackets and matchups
+* Improving the tournament management experience
+* Serving as a foundation for larger projects (tournament SaaS)
 
 ---
 
-## 🤝 Contribuição
+## 🔮 Possible future improvements
 
-Contribuições são bem-vindas!
+* 📱 Responsive mobile interface
+* 📡 REST API with Django Rest Framework
+* 🏅 Player history system
+* 📈 Advanced statistics
+* 🎥 Integration with large screen (match display)
+* ☁️ Cloud deployment (AWS / Render)
 
-1. Fork o projeto
-2. Crie uma branch (`git checkout -b feature/nova-feature`)
+---
+
+## 🤝 Contribution
+
+Contributions are welcome!
+
+1. Fork the project
+2. Create a branch (`git checkout -b feature/nova-feature`)
 3. Commit (`git commit -m 'feat: nova feature'`)
 4. Push (`git push origin feature/nova-feature`)
-5. Abra um Pull Request
-
----
-
-## 📄 Licença
-
-Este projeto está sob a licença MIT.
-
----
-
-## 👨‍💻 Autor
-
-Desenvolvido por **Marco Antonio**
-🔗 GitHub: [https://github.com/marcoantonio567](https://github.com/marcoantonio567)
-
----
+5. Open a Pull Request
